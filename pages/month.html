@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月度排班 - 排班小助手</title>
+  <meta name="theme-color" content="#F46FAE">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../icon.svg">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --color-background: var(--sakura-background);
+      --color-foreground: var(--sakura-foreground);
+      --color-card: var(--sakura-card);
+      --color-card-foreground: var(--sakura-card-foreground);
+      --color-primary: var(--sakura-primary);
+      --color-primary-foreground: var(--sakura-primary-foreground);
+      --color-muted: var(--sakura-muted);
+      --color-muted-foreground: var(--sakura-muted-foreground);
+      --color-border: var(--sakura-border);
+      --color-input: var(--sakura-input);
+      --color-ring: var(--sakura-ring);
+      --radius-sm: var(--sakura-radius-sm);
+      --radius-md: var(--sakura-radius-md);
+      --radius-lg: var(--sakura-radius-lg);
+    }
+    @layer base {
+      body { background: var(--sakura-background); color: var(--sakura-foreground); }
+      td, th { @apply break-words; }
+      th { @apply whitespace-nowrap; }
+    }
+  </style>
+  <style>
+    .bg-background { background-color: var(--sakura-background); }
+    .text-foreground { color: var(--sakura-foreground); }
+    .bg-card { background-color: var(--sakura-card); }
+    .text-card-foreground { color: var(--sakura-card-foreground); }
+    .bg-primary { background-color: var(--sakura-primary); }
+    .text-primary { color: var(--sakura-primary); }
+    .text-primary-foreground { color: var(--sakura-primary-foreground); }
+    .bg-primary-foreground { background-color: var(--sakura-primary-foreground); }
+    .bg-muted { background-color: var(--sakura-muted); }
+    .text-muted-foreground { color: var(--sakura-muted-foreground); }
+    .border-border { border-color: var(--sakura-border); }
+    .border-input { border-color: var(--sakura-input); }
+    .ring-ring { --tw-ring-color: var(--sakura-ring); }
+    .hover\:bg-muted:hover { background-color: var(--sakura-muted); }
+    .hover\:bg-primary\/10:hover { background-color: rgba(244,111,174,.1); }
+    .bg-primary\/5 { background-color: rgba(244,111,174,.05); }
+    .bg-primary\/10 { background-color: rgba(244,111,174,.1); }
+    .bg-primary\/20 { background-color: rgba(244,111,174,.2); }
+    .bg-muted\/30 { background-color: rgba(252,231,238,.3); }
+    .border-primary\/30 { border-color: rgba(244,111,174,.3); }
+    .text-primary\/80 { color: rgba(244,111,174,.8); }
+    .focus\:ring-2:focus { box-shadow: 0 0 0 2px var(--sakura-ring); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
+    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
+          <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+        </div>
+        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="badge badge-primary ml-1" id="user-badge"></span>
+      </div>
+      <div class="flex items-center gap-1">
+        <a href="month.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">月视图</a>
+        <a href="week.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">周视图</a>
+        <a href="dashboard.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">统计</a>
+        <a href="settings.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>AI
+        </button>
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md" title="退出登录">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-full max-w-[1280px] mx-auto px-4 md:px-6 py-6">
+    <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+      <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+        <div class="relative flex-1 max-w-xs">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--sakura-ink-3)"></i>
+          <input id="search-input" type="text" placeholder="搜索品牌或班次..." class="input-field pl-10" style="height: 36px">
+        </div>
+        <select id="filter-type" class="input-field" style="height: 36px; width: auto">
+          <option value="">全部班次</option>
+          <option value="早班">早班</option>
+          <option value="中班">中班</option>
+          <option value="晚班">晚班</option>
+          <option value="加班">加班</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="prev-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+        <select id="year-select" class="input-field" style="height: 36px; width: auto"></select>
+        <select id="month-select" class="input-field" style="height: 36px; width: auto"></select>
+        <button id="next-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+        <button id="today-btn" class="btn-ghost px-3 py-1.5 rounded-md text-sm">今天</button>
+      </div>
+    </div>
+
+    <div id="conflict-alert" class="hidden mb-4 card p-3 flex items-center gap-2" style="border-color: var(--sakura-state-error)">
+      <i data-lucide="alert-triangle" class="w-5 h-5" style="color: var(--sakura-state-error)"></i>
+      <span id="conflict-text" class="text-sm" style="color: var(--sakura-state-error)"></span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-2 card p-5">
+        <div class="grid grid-cols-7 gap-1 text-center text-xs mb-2" style="color: var(--sakura-muted-foreground)">
+          <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+        </div>
+        <div class="grid grid-cols-7 gap-1" id="calendar-grid"></div>
+      </section>
+
+      <aside class="space-y-4">
+        <section class="card p-5">
+          <h2 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i data-lucide="wallet" class="w-5 h-5" style="color: var(--sakura-primary)"></i>工资概览
+          </h2>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="rounded-xl p-3" style="background: var(--sakura-muted)">
+              <p class="text-xs mb-1" style="color: var(--sakura-muted-foreground)">本月工时</p>
+              <p class="text-2xl font-bold" id="total-hours">0.0</p>
+              <p class="text-xs" style="color: var(--sakura-muted-foreground)">小时</p>
+            </div>
+            <div class="rounded-xl p-3" style="background: rgba(244,111,174,.1)">
+              <p class="text-xs mb-1" style="color: var(--sakura-primary)">预估工资</p>
+              <p class="text-2xl font-bold" style="color: var(--sakura-primary)" id="total-salary">¥0</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-4 text-center">
+            <div>
+              <p class="text-xs" style="color: var(--sakura-muted-foreground)">班次数</p>
+              <p class="text-lg font-semibold" id="shift-count">0</p>
+            </div>
+            <div>
+              <p class="text-xs" style="color: var(--sakura-muted-foreground)">日均工时</p>
+              <p class="text-lg font-semibold" id="avg-hours">0.0h</p>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-medium">品牌汇总</p>
+              <button id="export-month" class="text-xs px-2 py-1 rounded" style="background: var(--sakura-muted); color: var(--sakura-foreground)">导出CSV</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left" id="brand-summary">
+                <thead><tr style="color: var(--sakura-muted-foreground); border-bottom: 1px solid var(--sakura-border)">
+                  <th class="py-1 font-normal">品牌</th><th class="py-1 font-normal text-right">工时</th><th class="py-1 font-normal text-right">工资</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="card p-5">
+          <h2 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-5 h-5" style="color: var(--sakura-primary)"></i>添加班次
+          </h2>
+          <button id="voice-btn" class="mb-3 w-full rounded-lg border p-2.5 text-sm font-medium flex items-center justify-center gap-2" style="border-color: rgba(244,111,174,.3); background: rgba(244,111,174,.05); color: var(--sakura-primary)">
+            <i data-lucide="mic" class="w-4 h-4"></i>语音添加班次
+          </button>
+          <p id="voice-status" class="text-xs mb-3 hidden" style="color: var(--sakura-muted-foreground)"></p>
+          <form id="shift-form" class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">日期</label>
+              <input type="date" name="date" required class="input-field">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">班次类型</label>
+                <select name="type" class="input-field">
+                  <option value="早班">早班</option><option value="中班">中班</option>
+                  <option value="晚班">晚班</option><option value="加班">加班</option><option value="自定义">自定义</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">品牌/商家</label>
+                <input type="text" name="brand" list="brand-suggestions" placeholder="如欧莱雅" class="input-field">
+                <datalist id="brand-suggestions"></datalist>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">开始</label>
+                <input type="time" name="start" required value="09:00" class="input-field">
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">结束</label>
+                <input type="time" name="end" required value="18:00" class="input-field">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">时薪 (¥)</label>
+              <input type="number" name="wage" min="0" step="0.5" required value="25" class="input-field">
+            </div>
+            <div class="flex gap-2">
+              <button type="submit" class="btn-primary flex-1 font-medium" style="height: 40px">添加并计算</button>
+              <button type="button" id="save-template-btn" class="btn-ghost border px-3 rounded-md text-sm" style="border-color: var(--sakura-border)">存模板</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card p-5">
+          <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+            <i data-lucide="bookmark" class="w-5 h-5" style="color: var(--sakura-primary)"></i>班次模板
+          </h2>
+          <div id="template-list" class="space-y-2 max-h-40 overflow-y-auto no-scrollbar"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/store.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/ai.js"></script>
+  <script src="../assets/js/ai-panel.js"></script>
+  <script>
+    Auth.requireAuth();
+    Utils.initTheme();
+
+    document.getElementById('user-badge').textContent = Auth.getCurrentUser().name;
+    document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      Utils.toggleTheme();
+      location.reload();
+    });
+    document.getElementById('ai-toggle').addEventListener('click', () => AIPanel.toggle());
+
+    (function() {
+      const calendarGrid = document.getElementById('calendar-grid');
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+      const searchInput = document.getElementById('search-input');
+      const filterType = document.getElementById('filter-type');
+
+      const today = new Date();
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth();
+
+      function getFilteredShifts() {
+        let shifts = Store.loadShifts();
+        const search = searchInput.value.trim().toLowerCase();
+        const typeFilter = filterType.value;
+        if (search) {
+          shifts = shifts.filter(s => (s.brand || '').toLowerCase().includes(search) || s.type.toLowerCase().includes(search));
+        }
+        if (typeFilter) {
+          shifts = shifts.filter(s => s.type === typeFilter);
+        }
+        return shifts;
+      }
+
+      function initSelectors() {
+        const baseYear = today.getFullYear();
+        yearSelect.innerHTML = '';
+        for (let y = baseYear - 5; y <= baseYear + 5; y++) {
+          yearSelect.add(new Option(y + '年', y));
+        }
+        monthSelect.innerHTML = '';
+        for (let m = 0; m < 12; m++) {
+          monthSelect.add(new Option((m + 1) + '月', m));
+        }
+      }
+
+      function updateSelectors() {
+        yearSelect.value = currentYear;
+        monthSelect.value = currentMonth;
+      }
+
+      function renderMonth() {
+        const shifts = getFilteredShifts();
+        calendarGrid.innerHTML = '';
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const startWeekday = firstDay.getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        for (let i = 0; i < startWeekday; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'min-h-20 rounded-lg';
+          cell.style.background = 'var(--sakura-muted)';
+          cell.style.opacity = '0.3';
+          calendarGrid.appendChild(cell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = Utils.toISODate(currentYear, currentMonth + 1, d);
+          const dayShifts = shifts.filter(s => s.date === dateStr);
+          const isToday = dateStr === Utils.toISODate(today.getFullYear(), today.getMonth() + 1, today.getDate());
+          const cell = document.createElement('div');
+          cell.className = 'min-h-20 rounded-lg border p-1.5 flex flex-col gap-1 cursor-pointer transition-shadow hover:shadow-md';
+          cell.style.borderColor = isToday ? 'var(--sakura-primary)' : 'var(--sakura-border)';
+          cell.style.background = isToday ? 'rgba(244,111,174,.05)' : 'var(--sakura-background)';
+
+          const num = document.createElement('span');
+          num.className = 'text-xs font-medium';
+          num.style.color = isToday ? 'var(--sakura-primary)' : 'var(--sakura-foreground)';
+          num.textContent = d;
+          cell.appendChild(num);
+
+          dayShifts.forEach(s => {
+            const chip = document.createElement('span');
+            chip.className = 'text-[10px] leading-tight px-1 py-0.5 rounded truncate';
+            chip.style.background = 'rgba(244,111,174,.1)';
+            chip.style.color = 'var(--sakura-primary)';
+            chip.textContent = (s.brand || s.type);
+            chip.title = (s.brand ? s.brand + ' ' : '') + s.type + ' ' + s.start + '-' + s.end + ' ¥' + s.wage + '/h';
+            cell.appendChild(chip);
+          });
+
+          cell.addEventListener('click', () => {
+            const dateInput = document.querySelector('[name="date"]');
+            dateInput.value = dateStr;
+            dateInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+
+          calendarGrid.appendChild(cell);
+        }
+
+        checkConflicts();
+      }
+
+      function renderSummary() {
+        const shifts = getFilteredShifts();
+        const stats = Utils.getMonthStats(shifts, currentYear, currentMonth + 1);
+
+        document.getElementById('total-hours').textContent = stats.totalHours.toFixed(1);
+        document.getElementById('total-salary').textContent = Utils.formatMoney(stats.totalSalary);
+        document.getElementById('shift-count').textContent = stats.count;
+        document.getElementById('avg-hours').textContent = stats.count > 0 ? (stats.totalHours / stats.count).toFixed(1) + 'h' : '0.0h';
+
+        const tbody = document.querySelector('#brand-summary tbody');
+        tbody.innerHTML = '';
+        Object.keys(stats.brandStats).sort().forEach(brand => {
+          const s = stats.brandStats[brand];
+          tbody.insertAdjacentHTML('beforeend',
+            '<tr style="border-bottom: 1px solid var(--sakura-border)"><td class="py-1.5">' + brand + '</td><td class="py-1.5 text-right">' + s.hours.toFixed(1) + 'h</td><td class="py-1.5 text-right font-medium" style="color: var(--sakura-primary)">' + Utils.formatMoney(s.salary) + '</td></tr>'
+          );
+        });
+        if (stats.count === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" class="py-2 text-sm text-center" style="color: var(--sakura-muted-foreground)">暂无记录</td></tr>';
+        }
+
+        updateBrandSuggestions();
+      }
+
+      function checkConflicts() {
+        const shifts = Store.loadShifts();
+        const conflicts = AI.detectConflicts(shifts);
+        const alert = document.getElementById('conflict-alert');
+        const text = document.getElementById('conflict-text');
+        if (conflicts.length > 0) {
+          alert.classList.remove('hidden');
+          text.textContent = '发现 ' + conflicts.length + ' 个时间冲突: ' + conflicts[0].message;
+        } else {
+          alert.classList.add('hidden');
+        }
+      }
+
+      function updateBrandSuggestions() {
+        const shifts = Store.loadShifts();
+        const brands = Array.from(new Set(shifts.map(s => s.brand).filter(Boolean))).sort();
+        document.getElementById('brand-suggestions').innerHTML = brands.map(b => '<option value="' + b + '">').join('');
+      }
+
+      function deleteShift(id) {
+        if (!confirm('确定删除这条排班？')) return;
+        let shifts = Store.loadShifts();
+        shifts = shifts.filter(s => s.id !== id);
+        Store.saveShifts(shifts);
+        renderMonth();
+        renderSummary();
+        renderTemplates();
+        Utils.showToast('已删除');
+      }
+
+      function renderTemplates() {
+        const templates = Store.loadTemplates();
+        const list = document.getElementById('template-list');
+        list.innerHTML = '';
+        if (templates.length === 0) {
+          list.innerHTML = '<p class="text-sm" style="color: var(--sakura-muted-foreground)">还没有模板</p>';
+          return;
+        }
+        templates.forEach((t, idx) => {
+          list.insertAdjacentHTML('beforeend',
+            '<div class="flex items-center justify-between text-sm p-2 rounded-lg" style="background: var(--sakura-muted)">' +
+            '<span class="truncate" style="color: var(--sakura-foreground)">' + (t.brand || '未填写') + ' · ' + t.type + ' · ' + t.start + '-' + t.end + ' · ¥' + t.wage + '</span>' +
+            '<span class="flex gap-1">' +
+            '<button data-apply="' + idx + '" class="px-2 py-1 rounded text-xs" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">用</button>' +
+            '<button data-del-tpl="' + idx + '" class="px-2 py-1 rounded text-xs" style="background: var(--sakura-border); color: var(--sakura-foreground)">删</button>' +
+            '</span></div>'
+          );
+        });
+      }
+
+      list.addEventListener('click', function(e) {
+        const apply = e.target.closest('[data-apply]');
+        const del = e.target.closest('[data-del-tpl]');
+        if (apply) {
+          const t = Store.loadTemplates()[parseInt(apply.dataset.apply)];
+          const form = document.getElementById('shift-form');
+          form.querySelector('[name="type"]').value = t.type;
+          form.querySelector('[name="brand"]').value = t.brand;
+          form.querySelector('[name="start"]').value = t.start;
+          form.querySelector('[name="end"]').value = t.end;
+          form.querySelector('[name="wage"]').value = t.wage;
+          form.querySelector('[name="date"]').focus();
+        }
+        if (del) {
+          const templates = Store.loadTemplates();
+          templates.splice(parseInt(del.dataset.delTpl), 1);
+          Store.saveTemplates(templates);
+          renderTemplates();
+        }
+      });
+
+      function startVoice() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { Utils.showToast('浏览器不支持语音识别'); return; }
+        const rec = new SR();
+        rec.lang = 'zh-CN';
+        rec.interimResults = false;
+        const status = document.getElementById('voice-status');
+        status.classList.remove('hidden');
+        status.textContent = '正在聆听...';
+        rec.start();
+        rec.onresult = function(e) {
+          const text = e.results[0][0].transcript;
+          status.textContent = '识别结果: ' + text;
+          const parsed = AI.parseScheduleText(text);
+          const form = document.getElementById('shift-form');
+          if (parsed.date) form.querySelector('[name="date"]').value = parsed.date;
+          if (parsed.type) form.querySelector('[name="type"]').value = parsed.type;
+          if (parsed.brand) form.querySelector('[name="brand"]').value = parsed.brand;
+          if (parsed.start) form.querySelector('[name="start"]').value = parsed.start;
+          if (parsed.end) form.querySelector('[name="end"]').value = parsed.end;
+          if (parsed.wage) form.querySelector('[name="wage"]').value = parsed.wage;
+        };
+        rec.onerror = function(e) { status.textContent = '识别失败: ' + e.error; };
+      }
+
+      const form = document.getElementById('shift-form');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const date = fd.get('date');
+        const start = fd.get('start');
+        const end = fd.get('end');
+        if (!date) { Utils.showToast('请选择日期'); return; }
+        if (Utils.hoursBetween(start, end) <= 0) { Utils.showToast('结束时间必须晚于开始时间'); return; }
+
+        const shifts = Store.loadShifts();
+        shifts.push({
+          id: Date.now(),
+          date: date,
+          type: fd.get('type'),
+          brand: (fd.get('brand') || '').trim(),
+          start: start,
+          end: end,
+          wage: parseFloat(fd.get('wage')) || 0
+        });
+        Store.saveShifts(shifts);
+        renderMonth();
+        renderSummary();
+        renderTemplates();
+        form.reset();
+        form.querySelector('[name="start"]').value = '09:00';
+        form.querySelector('[name="end"]').value = '18:00';
+        form.querySelector('[name="wage"]').value = '25';
+        Utils.showToast('班次已添加');
+      });
+
+      document.getElementById('save-template-btn').addEventListener('click', function() {
+        const fd = new FormData(document.getElementById('shift-form'));
+        const templates = Store.loadTemplates();
+        templates.push({
+          id: Date.now(),
+          type: fd.get('type'),
+          brand: (fd.get('brand') || '').trim(),
+          start: fd.get('start'),
+          end: fd.get('end'),
+          wage: parseFloat(fd.get('wage')) || 0
+        });
+        Store.saveTemplates(templates);
+        renderTemplates();
+        Utils.showToast('模板已保存');
+      });
+
+      document.getElementById('voice-btn').addEventListener('click', startVoice);
+      document.getElementById('export-month').addEventListener('click', function() {
+        const prefix = currentYear + '-' + String(currentMonth + 1).padStart(2, '0');
+        const rows = Store.loadShifts().filter(s => s.date.startsWith(prefix)).sort((a, b) => a.date.localeCompare(b.date));
+        Utils.exportCSV('排班_' + prefix + '.csv', rows);
+      });
+
+      yearSelect.addEventListener('change', () => { currentYear = parseInt(yearSelect.value); renderMonth(); renderSummary(); });
+      monthSelect.addEventListener('change', () => { currentMonth = parseInt(monthSelect.value); renderMonth(); renderSummary(); });
+      document.getElementById('prev-month').addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateSelectors(); renderMonth(); renderSummary(); });
+      document.getElementById('next-month').addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateSelectors(); renderMonth(); renderSummary(); });
+      document.getElementById('today-btn').addEventListener('click', () => { currentYear = today.getFullYear(); currentMonth = today.getMonth(); updateSelectors(); renderMonth(); renderSummary(); });
+      searchInput.addEventListener('input', Utils.debounce(() => { renderMonth(); renderSummary(); }));
+      filterType.addEventListener('change', () => { renderMonth(); renderSummary(); });
+
+      global.refreshApp = function() { renderMonth(); renderSummary(); renderTemplates(); };
+
+      initSelectors();
+      updateSelectors();
+      renderMonth();
+      renderSummary();
+      renderTemplates();
+    })();
+  </script>
+  <script>lucide.createIcons();</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../sw.js', { scope: './' });
+    }
+  </script>
+</body>
+</html>

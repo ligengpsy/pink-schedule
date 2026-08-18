@@ -1,0 +1,20 @@
+{
+  "name": "排班小助手 - AI智能排班",
+  "short_name": "排班助手",
+  "description": "粉色主题AI智能排班表，支持月/周视图、工资计算、AI助手、统计分析、数据隔离",
+  "start_url": "./index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFF6F8",
+  "theme_color": "#F46FAE",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

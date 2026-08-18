@@ -1,0 +1,96 @@
+{
+  "success": true,
+  "outcome": "passed",
+  "repairable": true,
+  "terminalViolations": [],
+  "terminalBlockingSummary": null,
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.08.06.19.15.08",
+    "version_source": "skill-release-manifest.json",
+    "runtime_skill_dir": null,
+    "recorded_at": null,
+    "expected_version": "2026.08.06.19.15.08",
+    "status": "matched",
+    "read_status": "ok"
+  },
+  "operatingMode": "free-explore",
+  "renderBlockingErrorCount": 0,
+  "softWarningCount": 1,
+  "renderBlockingErrors": [],
+  "errorSignatures": [],
+  "softWarnings": [
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--sakura-shadow-2: 0 8px 24px -8px rgba(74, 59, 64, 0.14))."
+  ],
+  "repairPlanHints": [],
+  "repairActionTable": [],
+  "errorCount": 0,
+  "warningCount": 1,
+  "errors": [],
+  "warnings": [
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--sakura-shadow-2: 0 8px 24px -8px rgba(74, 59, 64, 0.14))."
+  ],
+  "validationRunDisciplineStatus": {
+    "declared": true,
+    "restoreMode": false,
+    "maxFullValidationRuns": 2,
+    "validationHistoryCount": 0,
+    "repairLedgerCount": 0,
+    "softWarningsTriggerRepair": false,
+    "terminalState": null,
+    "nextAction": null,
+    "violations": [],
+    "success": true
+  },
+  "terminalState": null,
+  "nextCheck": {
+    "type": "finish-readiness",
+    "command": "node '/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule' --check=all",
+    "fullValidationAllowed": false,
+    "reason": "workspace validation passed; run complete finish readiness before final delivery"
+  },
+  "repairBatch": [],
+  "repairContextPacket": {
+    "schema_version": "1.0",
+    "purpose": "small-context repair packet; read this before full validation-report.json",
+    "success": true,
+    "terminalState": null,
+    "skillProvenance": {
+      "name": "solo-design",
+      "version": "2026.08.06.19.15.08",
+      "version_source": "skill-release-manifest.json",
+      "runtime_skill_dir": null,
+      "recorded_at": null,
+      "expected_version": "2026.08.06.19.15.08",
+      "status": "matched",
+      "read_status": "ok"
+    },
+    "renderBlockingErrorCount": 0,
+    "softWarningCount": 1,
+    "renderBlockingErrors": [],
+    "repairActionTable": [],
+    "nextCheck": {
+      "type": "finish-readiness",
+      "command": "node '/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule' --check=all",
+      "fullValidationAllowed": false,
+      "reason": "workspace validation passed; run complete finish readiness before final delivery"
+    },
+    "forbidden": [
+      "do not read validator source",
+      "do not rerun full validation when nextCheck.fullValidationAllowed=false",
+      "do not start preview/browser unless user explicitly asks",
+      "do not hand-edit repair ledger fields"
+    ]
+  },
+  "projectFileHashes": {
+    ".design": "a43067e252eca86afbbefe365faae4e219d75ef823046db605129b999fa16ac8",
+    "colors_and_type.css": "602907402daefa6ddd92255c6e5759f91f2d23297ca537f5d92c27b9c76eb366",
+    "runtime-orchestration-summary.json": "adbd5af557139f63eedded56089f4d33ca820f4be46a478ccbb81ea4b7fcc1a1",
+    "pages/index.html": "6e3a3ca9196e530c2eefdae5108983cd8e00a560d6c60af41a6211cf89f88e20",
+    "pages/week.html": "96cffb4ec073d5ac138c2c257d79793c4837f37bdff698fb17d5a650c2e00d19"
+  },
+  "designDir": "/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule",
+  "expectedPages": 2,
+  "requireInteractions": null,
+  "checkedAt": "2026-08-17T14:45:09.183Z"
+}

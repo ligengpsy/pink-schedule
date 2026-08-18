@@ -1,0 +1,550 @@
+{
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.08.06.19.15.08",
+    "release": "prompt-base-cloud-ssot-migration",
+    "version_source": "skill-release-manifest.json"
+  },
+  "language": "zh-CN",
+  "pages": [
+    {
+      "nodeId": "page-index",
+      "htmlSrc": "pages/index.html",
+      "title": "月度排班",
+      "writeMode": "SkeletonMainAtomic",
+      "viewportMode": "document-scroll",
+      "deviceType": "desktop",
+      "pageType": "task-driven",
+      "stateRole": "base",
+      "stateGroupId": "schedule-tabs",
+      "domIdsRequired": [
+        "tab-month-index",
+        "tab-week-index",
+        "schedule-calendar",
+        "add-shift-form",
+        "salary-summary"
+      ],
+      "supplementaryReads": []
+    },
+    {
+      "nodeId": "page-week",
+      "htmlSrc": "pages/week.html",
+      "title": "周排班",
+      "writeMode": "DerivedCopyMutableOnly",
+      "viewportMode": "document-scroll",
+      "deviceType": "desktop",
+      "pageType": "task-driven",
+      "stateRole": "derived",
+      "stateGroupId": "schedule-tabs",
+      "derivedFromHtmlSrc": "pages/index.html",
+      "mutableRegions": [
+        "view tab active state",
+        "calendar panel",
+        "week schedule panel",
+        "page title suffix"
+      ],
+      "domIdsRequired": [
+        "tab-month-week",
+        "tab-week-week",
+        "week-schedule"
+      ],
+      "supplementaryReads": []
+    }
+  ],
+  "project": {
+    "name": "pink-schedule",
+    "displayName": "粉色排班工资表",
+    "description": "粉色主题的月度/周度排班表，可添加班次选项并自动计算工资",
+    "resolvedLane": "free_exploration",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "viewportMode": "document-scroll",
+    "intentProfile": {
+      "caseFamily": "free_exploration",
+      "operatingMode": "free-explore",
+      "deviceType": "desktop",
+      "pageType": "task-driven",
+      "routingReason": "Open-ended tool UI with month/week schedule tabs and salary calculator; no active Design Library or restore target. Stateful free-fast path."
+    },
+    "selectedIntentWorkflowRead": true,
+    "contextRequirementsLoaded": [
+      {
+        "path": "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/page-rendering-quality-gate.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/design-artifact-validation.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/delivery-evidence-contract.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "visual-experience/visual-experience-guidelines.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      }
+    ],
+    "contextReadScope": {
+      "mainAgent": {
+        "forbiddenReads": [
+          "other intent-workflows/**",
+          "Sub-Agent implementation files before dispatch"
+        ]
+      },
+      "pageSubAgent": {
+        "allowedReads": [
+          "current lane page runtime guide",
+          "current lane dispatch contract excerpt",
+          "current Page Packet",
+          "supplementaryReads[] only"
+        ],
+        "forbiddenReads": [
+          "SKILL.md full re-read",
+          "other intent-workflows/**",
+          "full runtime-orchestration-summary.json unless explicitly sliced"
+        ]
+      },
+      "readScopeLedgerWriter": "shared-runtime/deterministic-tooling/build-page-dispatch-manifest.mjs"
+    },
+    "validationRunDiscipline": {
+      "maxFullValidationRuns": 2,
+      "softWarningsTriggerRepair": false,
+      "blockingRepairMode": "targeted-once",
+      "forbiddenRepairTriggers": [
+        "soft-warning-only",
+        "provenance-warning-only",
+        "style-warning-only"
+      ]
+    },
+    "lowValueCallWatchdog": {
+      "applies": true,
+      "noProgressSignals": [
+        "no_tool_call",
+        "no_artifact_diff",
+        "no_structured_decision"
+      ],
+      "noProgressNextAction": "enter_readiness_or_blocked_summary"
+    },
+    "creativeRecipe": {
+      "businessTone": "friendly personal productivity tool",
+      "layoutArchetype": "dashboard with sticky summary sidebar + calendar main area",
+      "visualSignature": "soft pink primary on warm neutral surfaces, rounded cards, calm and organized",
+      "densityTarget": "balanced",
+      "avoidOneThing": "overly feminine decorative elements that reduce clarity"
+    },
+    "brandPrefix": "sakura",
+    "cssPreflightEvidence": {
+      "applies": true,
+      "status": "passed",
+      "command": "node {SKILL_DIR}/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/colors_and_type.css /Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/.preflight/preflight.html --title=\"Preflight\" --lang=zh-CN --prefix=sakura",
+      "brandPrefix": "sakura",
+      "checks": {
+        "themeVars": "present",
+        "semanticTokenFallback": "present",
+        "themeInline": "present",
+        "tailwindCdn": "present",
+        "lucideCdn": "present",
+        "htmlClass": "present",
+        "semanticMappings": "resolved"
+      },
+      "retryCount": 0,
+      "blockingReason": null
+    },
+    "stateGroupId": "schedule-tabs",
+    "statePlan": {
+      "basePage": {
+        "nodeId": "page-index",
+        "htmlSrc": "pages/index.html",
+        "stateRole": "base"
+      },
+      "derivedPages": [
+        {
+          "nodeId": "page-week",
+          "htmlSrc": "pages/week.html",
+          "stateRole": "derived",
+          "derivedFromHtmlSrc": "pages/index.html",
+          "mutableRegions": [
+            "view tab active state",
+            "calendar panel",
+            "week schedule panel",
+            "page title suffix"
+          ]
+        }
+      ],
+      "immutableShellRegions": [
+        "body/main frame",
+        "header",
+        "sidebar add-form",
+        "salary summary card",
+        "tab switcher",
+        "page background",
+        "spacing/typography scale"
+      ]
+    },
+    "defaultDeliverableVisibility": {
+      "applies": true,
+      "requiredVisibleRegions": [
+        {
+          "htmlSrc": "pages/index.html",
+          "selector": "#schedule-calendar",
+          "label": "month schedule calendar",
+          "source": "user requirement"
+        },
+        {
+          "htmlSrc": "pages/index.html",
+          "selector": "#add-shift-form",
+          "label": "add shift options form",
+          "source": "user requirement"
+        },
+        {
+          "htmlSrc": "pages/index.html",
+          "selector": "#salary-summary",
+          "label": "salary calculation summary",
+          "source": "user requirement"
+        },
+        {
+          "htmlSrc": "pages/week.html",
+          "selector": "#week-schedule",
+          "label": "week schedule view",
+          "source": "user requirement"
+        }
+      ],
+      "hiddenAllowed": [
+        {
+          "selector": "#add-shift-modal",
+          "label": "mobile add-shift modal",
+          "reason": "optional overlay triggered by add button; desktop form always visible"
+        }
+      ]
+    },
+    "sharedProjectShellContract": {
+      "header": {
+        "heightPx": 64,
+        "position": "sticky-top",
+        "background": "var(--sakura-background)",
+        "bottomBorder": "var(--sakura-border)"
+      }
+    },
+    "dispatchPreflightManifest": [
+      {
+        "recorded_at": "2026-08-17T13:12:33.808Z",
+        "generatedBy": "build-page-dispatch-manifest.mjs",
+        "packetType": "FreePagePacket",
+        "laneContract": {
+          "resolvedLane": "free_exploration",
+          "packetType": "FreePagePacket",
+          "pageRuntimeGuide": "intent-workflows/intent-page-free-exploration/free-exploration-page-runtime.md",
+          "dispatchContract": "intent-workflows/intent-page-free-exploration/dispatch-contract.md"
+        },
+        "taskLinePresent": true,
+        "outputPathPresent": true,
+        "sharedTemplate": "intent-workflows/intent-page-free-exploration/free-exploration-page-runtime.md",
+        "nodeId": "page-index",
+        "htmlSrc": "pages/index.html",
+        "supplementaryReads": [],
+        "allowedWritePaths": [
+          "pages/index.html",
+          "assets/"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json",
+          "restore-contract-report.json",
+          "page-generation-summary.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/index.html",
+            "assets/"
+          ]
+        },
+        "skillRuntime": {
+          "skillDir": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design",
+          "deterministicToolDir": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling",
+          "toolPaths": {
+            "applyHtmlHeadContract": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs",
+            "recordDispatchCompletion": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/record-dispatch-completion.mjs",
+            "buildPageDispatchManifest": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/build-page-dispatch-manifest.mjs",
+            "validateDesignWorkspace": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-design-workspace.mjs",
+            "validateFinishReadiness": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs",
+            "validateRestoreContract": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-restore-contract.mjs"
+          },
+          "requiredForPageSubAgent": [
+            "applyHtmlHeadContract",
+            "recordDispatchCompletion"
+          ],
+          "pathInjection": "absolute",
+          "pathContract": "Do not use {SKILL_DIR} placeholders inside Page Sub-Agent packets; use toolPaths.* absolute paths.",
+          "commandTemplates": {
+            "recordDispatchCompletion": "node '/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/record-dispatch-completion.mjs' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule' --node-id='page-index' --html-src='pages/index.html' --status=completed --changed-files=<comma-separated-project-relative-files> --trace-digest=<main-agent-runtime-trace-digest> --tool-ledger-json=<tool-ledger-json-or-file>"
+          }
+        },
+        "cssFilePath": "/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/colors_and_type.css",
+        "htmlFilePath": "/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/pages/index.html",
+        "brandPrefix": "sakura",
+        "aestheticsMode": "free-explore",
+        "toolDisciplineBlockPresent": true,
+        "fillHtmlHeadCommand": "node '/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/colors_and_type.css' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/pages/index.html' --title='月度排班' --lang='zh-CN' --prefix='sakura'",
+        "headFillMode": "skeleton-first",
+        "viewportMode": "document-scroll",
+        "completionSchemaExpected": "compact",
+        "restoreFields": null,
+        "restoreContractStatus": null,
+        "restoreCompactPacket": null,
+        "deterministicCommands": null,
+        "sourceAuthorityLock": null,
+        "preDispatchFileHashes": {
+          ".design": "57d7ec87facd08847c7ebefd4024b8cf7621574d897a90d1ab9110a7340e11bb"
+        },
+        "contextPreflight": {
+          "workflowPath": "intent-workflows/intent-page-free-exploration/INTENT_WORKFLOW.md",
+          "requiredContextFiles": [
+            "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+            "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+            "delivery-quality/page-rendering-quality-gate.md",
+            "delivery-quality/design-artifact-validation.md",
+            "delivery-quality/delivery-evidence-contract.md",
+            "visual-experience/visual-experience-guidelines.md"
+          ],
+          "optionalContextFiles": [],
+          "passed": true
+        },
+        "pageSliceOnly": true,
+        "requiredFieldsPresent": true,
+        "missingFields": [],
+        "fillHtmlHeadCommandValid": true,
+        "mobileNavigation": {
+          "required": false,
+          "appliesToThisPage": false,
+          "canonicalHtmlIncluded": false,
+          "missingFields": []
+        },
+        "persistedToSummary": true,
+        "taskQueryAudited": false,
+        "proofSource": "summary-only",
+        "largeWorkflowFilesInTaskQuery": null
+      },
+      {
+        "recorded_at": "2026-08-17T13:12:33.808Z",
+        "generatedBy": "build-page-dispatch-manifest.mjs",
+        "packetType": "FreePagePacket",
+        "laneContract": {
+          "resolvedLane": "free_exploration",
+          "packetType": "FreePagePacket",
+          "pageRuntimeGuide": "intent-workflows/intent-page-free-exploration/free-exploration-page-runtime.md",
+          "dispatchContract": "intent-workflows/intent-page-free-exploration/dispatch-contract.md"
+        },
+        "taskLinePresent": true,
+        "outputPathPresent": true,
+        "sharedTemplate": "intent-workflows/intent-page-free-exploration/free-exploration-page-runtime.md",
+        "nodeId": "page-week",
+        "htmlSrc": "pages/week.html",
+        "supplementaryReads": [],
+        "allowedWritePaths": [
+          "pages/week.html",
+          "assets/"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json",
+          "restore-contract-report.json",
+          "page-generation-summary.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/week.html",
+            "assets/"
+          ]
+        },
+        "skillRuntime": {
+          "skillDir": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design",
+          "deterministicToolDir": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling",
+          "toolPaths": {
+            "applyHtmlHeadContract": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs",
+            "recordDispatchCompletion": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/record-dispatch-completion.mjs",
+            "buildPageDispatchManifest": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/build-page-dispatch-manifest.mjs",
+            "validateDesignWorkspace": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-design-workspace.mjs",
+            "validateFinishReadiness": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs",
+            "validateRestoreContract": "/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-restore-contract.mjs"
+          },
+          "requiredForPageSubAgent": [
+            "applyHtmlHeadContract",
+            "recordDispatchCompletion"
+          ],
+          "pathInjection": "absolute",
+          "pathContract": "Do not use {SKILL_DIR} placeholders inside Page Sub-Agent packets; use toolPaths.* absolute paths.",
+          "commandTemplates": {
+            "recordDispatchCompletion": "node '/Users/a616161663/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/record-dispatch-completion.mjs' '/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule' --node-id='page-week' --html-src='pages/week.html' --status=completed --changed-files=<comma-separated-project-relative-files> --trace-digest=<main-agent-runtime-trace-digest> --tool-ledger-json=<tool-ledger-json-or-file>"
+          }
+        },
+        "cssFilePath": "/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/colors_and_type.css",
+        "htmlFilePath": "/Users/a616161663/Library/Application Support/TRAE SOLO CN/ModularData/ai-agent/work-mode-projects/6a83058a8916ee23cff28a28/pink-schedule/pages/week.html",
+        "brandPrefix": "sakura",
+        "aestheticsMode": "free-explore",
+        "toolDisciplineBlockPresent": true,
+        "fillHtmlHeadCommand": null,
+        "headFillMode": "skeleton-first",
+        "viewportMode": "document-scroll",
+        "completionSchemaExpected": "compact",
+        "restoreFields": null,
+        "restoreContractStatus": null,
+        "restoreCompactPacket": null,
+        "deterministicCommands": null,
+        "sourceAuthorityLock": null,
+        "preDispatchFileHashes": {
+          ".design": "57d7ec87facd08847c7ebefd4024b8cf7621574d897a90d1ab9110a7340e11bb"
+        },
+        "contextPreflight": {
+          "workflowPath": "intent-workflows/intent-page-free-exploration/INTENT_WORKFLOW.md",
+          "requiredContextFiles": [
+            "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+            "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+            "delivery-quality/page-rendering-quality-gate.md",
+            "delivery-quality/design-artifact-validation.md",
+            "delivery-quality/delivery-evidence-contract.md",
+            "visual-experience/visual-experience-guidelines.md"
+          ],
+          "optionalContextFiles": [],
+          "passed": true
+        },
+        "pageSliceOnly": true,
+        "requiredFieldsPresent": true,
+        "missingFields": [],
+        "fillHtmlHeadCommandValid": true,
+        "mobileNavigation": {
+          "required": false,
+          "appliesToThisPage": false,
+          "canonicalHtmlIncluded": false,
+          "missingFields": []
+        },
+        "persistedToSummary": true,
+        "taskQueryAudited": false,
+        "proofSource": "summary-only",
+        "largeWorkflowFilesInTaskQuery": null
+      }
+    ],
+    "wiringRegistrationEvidence": {
+      "expectedDomIds": [
+        "tab-month-index",
+        "tab-week-index",
+        "tab-month-week",
+        "tab-week-week"
+      ],
+      "allExpectedDomIdsRegistered": true,
+      "missingDomIds": []
+    },
+    "readScopeLedger": [
+      {
+        "actor": "page-sub-agent",
+        "lane": "free_exploration",
+        "path": "intent-workflows/intent-page-free-exploration/free-exploration-page-runtime.md",
+        "reason": "page runtime guide",
+        "scopeClass": "page-runtime",
+        "declaredBeforeRead": true,
+        "recordedAt": "2026-08-17T13:12:33.808Z",
+        "nodeId": "page-index",
+        "htmlSrc": "pages/index.html"
+      },
+      {
+        "actor": "page-sub-agent",
+        "lane": "free_exploration",
+        "path": "intent-workflows/intent-page-free-exploration/dispatch-contract.md",
+        "reason": "dispatch contract",
+        "scopeClass": "dispatch-contract",
+        "declaredBeforeRead": true,
+        "recordedAt": "2026-08-17T13:12:33.808Z",
+        "nodeId": "page-index",
+        "htmlSrc": "pages/index.html"
+      }
+    ],
+    "expectedDispatches": [
+      {
+        "nodeId": "page-week",
+        "pageId": "page-week",
+        "targetPageId": "page-week",
+        "htmlSrc": "pages/week.html",
+        "packetType": "FreePagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/week.html"
+        ],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "9e4e31ab50c24de5e083824e9015af3347fdf173b6737cb345abda043925880e",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        },
+        "recordedAt": "2026-08-17T13:36:29.409Z",
+        "source": "record-dispatch-completion.mjs"
+      },
+      {
+        "nodeId": "page-index",
+        "pageId": "page-index",
+        "targetPageId": "page-index",
+        "htmlSrc": "pages/index.html",
+        "packetType": "FreePagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/index.html"
+        ],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "0a9d9031fe9ed6e243ba509f1c400479acc63fabc1d1b0cd8dceca6604ad6c83",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        },
+        "recordedAt": "2026-08-17T13:36:16.903Z",
+        "source": "record-dispatch-completion.mjs"
+      }
+    ],
+    "mainAgentPostDispatchMutations": [
+      {
+        "path": "pages/index.html",
+        "reason": "added-localStorage-shared-state",
+        "owner": "main-agent",
+        "recordedAt": "2026-08-17T13:34:33.740Z",
+        "source": "record-dispatch-completion.mjs"
+      },
+      {
+        "path": ".design",
+        "reason": "registered-page-week-node",
+        "owner": "main-agent",
+        "recordedAt": "2026-08-17T13:36:29.409Z",
+        "source": "record-dispatch-completion.mjs"
+      }
+    ]
+  }
+}

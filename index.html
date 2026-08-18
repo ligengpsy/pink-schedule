@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>排班小助手 - 登录</title>
+  <meta name="theme-color" content="#F46FAE">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --color-background: var(--sakura-background);
+      --color-foreground: var(--sakura-foreground);
+      --color-card: var(--sakura-card);
+      --color-card-foreground: var(--sakura-card-foreground);
+      --color-primary: var(--sakura-primary);
+      --color-primary-foreground: var(--sakura-primary-foreground);
+      --color-muted: var(--sakura-muted);
+      --color-muted-foreground: var(--sakura-muted-foreground);
+      --color-border: var(--sakura-border);
+      --color-input: var(--sakura-input);
+      --color-ring: var(--sakura-ring);
+      --radius-sm: var(--sakura-radius-sm);
+      --radius-md: var(--sakura-radius-md);
+      --radius-lg: var(--sakura-radius-lg);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4" style="background: var(--sakura-background)">
+
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 rounded-full opacity-20" style="background: var(--sakura-primary); filter: blur(80px)"></div>
+    <div class="absolute -bottom-20 -right-20 w-96 h-96 rounded-full opacity-15" style="background: var(--sakura-state-info); filter: blur(80px)"></div>
+  </div>
+
+  <div class="relative w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 shadow-lg" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
+        <i data-lucide="calendar-heart" class="w-8 h-8"></i>
+      </div>
+      <h1 class="text-2xl font-bold" style="color: var(--sakura-foreground)">排班小助手</h1>
+      <p class="text-sm mt-1" style="color: var(--sakura-muted-foreground)">粉色主题 · AI智能 · 工资计算</p>
+    </div>
+
+    <div class="card shadow-lg p-8">
+      <form id="login-form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color: var(--sakura-muted-foreground)">账号</label>
+          <div class="relative">
+            <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--sakura-ink-3)"></i>
+            <input type="text" id="account" name="account" required autocomplete="username"
+              class="input-field pl-10"
+              style="height: 44px"
+              placeholder="请输入账号">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color: var(--sakura-muted-foreground)">密码</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--sakura-ink-3)"></i>
+            <input type="password" id="password" name="password" required autocomplete="current-password"
+              class="input-field pl-10 pr-10"
+              style="height: 44px"
+              placeholder="请输入密码">
+            <button type="button" id="toggle-pwd" class="absolute right-3 top-1/2 -translate-y-1/2">
+              <i data-lucide="eye-off" class="w-4 h-4" style="color: var(--sakura-ink-3)"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="error-msg" class="hidden text-sm text-center p-2 rounded-md" style="background: rgba(251,113,133,.1); color: var(--sakura-state-error)"></div>
+
+        <button type="submit" class="btn-primary w-full font-medium" style="height: 44px">
+          登 录
+        </button>
+      </form>
+
+      <div class="mt-6 pt-6 border-t text-center" style="border-color: var(--sakura-border)">
+        <p class="text-xs" style="color: var(--sakura-muted-foreground)">
+          <i data-lucide="shield-check" class="inline w-3 h-3"></i>
+          数据仅保存在本地，不同账号数据相互隔离
+        </p>
+      </div>
+    </div>
+
+    <p class="text-center text-xs mt-6" style="color: var(--sakura-ink-3)">
+      Pink Schedule v2.0 · Powered by AI
+    </p>
+  </div>
+
+  <script src="assets/js/auth.js"></script>
+  <script>
+    if (Auth.getSession()) {
+      location.href = 'pages/month.html';
+    }
+
+    document.getElementById('toggle-pwd').addEventListener('click', function() {
+      const pwd = document.getElementById('password');
+      const icon = this.querySelector('[data-lucide]');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.setAttribute('data-lucide', 'eye');
+      } else {
+        pwd.type = 'password';
+        icon.setAttribute('data-lucide', 'eye-off');
+      }
+      lucide.createIcons();
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const account = document.getElementById('account').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const result = Auth.login(account, password);
+      const errEl = document.getElementById('error-msg');
+
+      if (result.success) {
+        errEl.classList.add('hidden');
+        Utils.showToast('登录成功');
+        setTimeout(() => location.href = 'pages/month.html', 500);
+      } else {
+        errEl.textContent = result.error;
+        errEl.classList.remove('hidden');
+      }
+    });
+  </script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

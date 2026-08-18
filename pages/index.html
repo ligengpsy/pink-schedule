@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月度排班</title>
+    <meta name="theme-color" content="#F46FAE">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/svg+xml" href="../icon.svg">
+    <link rel="apple-touch-icon" href="../icon.svg">
+    <style id="theme-vars">
+/* Sakura pink theme tokens */
+:root {
+  /* Core semantic aliases expected by apply-html-head-contract */
+  --sakura-background: #FFF6F8;
+  --sakura-foreground: #4A3B40;
+  --sakura-card: #FFFFFF;
+  --sakura-card-foreground: #4A3B40;
+  --sakura-popover: #FFFFFF;
+  --sakura-popover-foreground: #4A3B40;
+  --sakura-primary: #F46FAE;
+  --sakura-primary-foreground: #FFFFFF;
+  --sakura-muted: #FCE7EE;
+  --sakura-muted-foreground: #8F6F78;
+  --sakura-border: #F8D0E0;
+  --sakura-input: #F8D0E0;
+  --sakura-ring: #F46FAE;
+
+  /* Radius scale */
+  --sakura-radius-sm: 6px;
+  --sakura-radius-md: 10px;
+  --sakura-radius-lg: 16px;
+
+  /* Visual experience tokens */
+  --sakura-surface: #FFFFFF;
+  --sakura-surface-2: #FCE7EE;
+  --sakura-ink: #4A3B40;
+  --sakura-ink-2: #7A5F66;
+  --sakura-ink-3: #A58891;
+  --sakura-line: #F8D0E0;
+  --sakura-brand: #F46FAE;
+  --sakura-brand-ink: #FFFFFF;
+  --sakura-state-success: #34D399;
+  --sakura-state-warning: #FBBF24;
+  --sakura-state-error: #FB7185;
+  --sakura-state-info: #60A5FA;
+
+  /* Spacing */
+  --sakura-s-1: 4px;
+  --sakura-s-2: 8px;
+  --sakura-s-3: 12px;
+  --sakura-s-4: 16px;
+  --sakura-s-5: 24px;
+  --sakura-s-6: 32px;
+  --sakura-s-7: 48px;
+  --sakura-s-8: 64px;
+
+  /* Typography */
+  --sakura-font-sans: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --sakura-font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Shadows */
+  --sakura-shadow-1: 0 1px 2px rgba(74, 59, 64, 0.05), 0 1px 1px rgba(74, 59, 64, 0.03);
+  --sakura-shadow-2: 0 8px 24px -8px rgba(74, 59, 64, 0.14);
+}
+
+html,
+body {
+  font-family: var(--sakura-font-sans);
+  color: var(--sakura-ink);
+  background: var(--sakura-background);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--sakura-background);
+    --color-foreground: var(--sakura-foreground);
+    --color-card: var(--sakura-card);
+    --color-card-foreground: var(--sakura-card-foreground);
+    --color-popover: var(--sakura-popover);
+    --color-popover-foreground: var(--sakura-popover-foreground);
+    --color-primary: var(--sakura-primary);
+    --color-primary-foreground: var(--sakura-primary-foreground);
+    --color-muted: var(--sakura-muted);
+    --color-muted-foreground: var(--sakura-muted-foreground);
+    --color-border: var(--sakura-border);
+    --color-input: var(--sakura-input);
+    --color-ring: var(--sakura-ring);
+    --radius-sm: var(--sakura-radius-sm);
+    --radius-md: var(--sakura-radius-md);
+    --radius-lg: var(--sakura-radius-lg);
+  }
+  @layer base {
+    body { background: var(--sakura-background); color: var(--sakura-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--sakura-background); }
+      .text-background { color: var(--sakura-background); }
+      .border-background { border-color: var(--sakura-background); }
+      .ring-background { --tw-ring-color: var(--sakura-background); }
+      .bg-foreground { background-color: var(--sakura-foreground); }
+      .text-foreground { color: var(--sakura-foreground); }
+      .border-foreground { border-color: var(--sakura-foreground); }
+      .ring-foreground { --tw-ring-color: var(--sakura-foreground); }
+      .bg-card { background-color: var(--sakura-card); }
+      .text-card { color: var(--sakura-card); }
+      .border-card { border-color: var(--sakura-card); }
+      .ring-card { --tw-ring-color: var(--sakura-card); }
+      .bg-card-foreground { background-color: var(--sakura-card-foreground); }
+      .text-card-foreground { color: var(--sakura-card-foreground); }
+      .border-card-foreground { border-color: var(--sakura-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--sakura-card-foreground); }
+      .bg-popover { background-color: var(--sakura-popover); }
+      .text-popover { color: var(--sakura-popover); }
+      .border-popover { border-color: var(--sakura-popover); }
+      .ring-popover { --tw-ring-color: var(--sakura-popover); }
+      .bg-popover-foreground { background-color: var(--sakura-popover-foreground); }
+      .text-popover-foreground { color: var(--sakura-popover-foreground); }
+      .border-popover-foreground { border-color: var(--sakura-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--sakura-popover-foreground); }
+      .bg-primary { background-color: var(--sakura-primary); }
+      .text-primary { color: var(--sakura-primary); }
+      .border-primary { border-color: var(--sakura-primary); }
+      .ring-primary { --tw-ring-color: var(--sakura-primary); }
+      .bg-primary-foreground { background-color: var(--sakura-primary-foreground); }
+      .text-primary-foreground { color: var(--sakura-primary-foreground); }
+      .border-primary-foreground { border-color: var(--sakura-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--sakura-primary-foreground); }
+      .bg-muted { background-color: var(--sakura-muted); }
+      .text-muted { color: var(--sakura-muted); }
+      .border-muted { border-color: var(--sakura-muted); }
+      .ring-muted { --tw-ring-color: var(--sakura-muted); }
+      .bg-muted-foreground { background-color: var(--sakura-muted-foreground); }
+      .text-muted-foreground { color: var(--sakura-muted-foreground); }
+      .border-muted-foreground { border-color: var(--sakura-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--sakura-muted-foreground); }
+      .bg-border { background-color: var(--sakura-border); }
+      .text-border { color: var(--sakura-border); }
+      .border-border { border-color: var(--sakura-border); }
+      .ring-border { --tw-ring-color: var(--sakura-border); }
+      .bg-input { background-color: var(--sakura-input); }
+      .text-input { color: var(--sakura-input); }
+      .border-input { border-color: var(--sakura-input); }
+      .ring-input { --tw-ring-color: var(--sakura-input); }
+      .bg-ring { background-color: var(--sakura-ring); }
+      .text-ring { color: var(--sakura-ring); }
+      .border-ring { border-color: var(--sakura-ring); }
+      .ring-ring { --tw-ring-color: var(--sakura-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="w-full max-w-[1280px] mx-auto px-4 md:px-6 py-6">
+      <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-semibold text-foreground">排班小助手</h1>
+            <p class="text-sm text-muted-foreground">粉色主题 · 月/周视图 · 自动算薪</p>
+          </div>
+        </div>
+        <nav class="inline-flex bg-card border border-border rounded-lg p-1 shadow-sm" aria-label="视图切换">
+          <a href="index.html" data-dom-id="tab-month-index" class="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground">月视图</a>
+          <a href="week.html" data-dom-id="tab-week-index" class="px-4 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted">周视图</a>
+        </nav>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section id="schedule-calendar" class="lg:col-span-2 bg-card border border-border rounded-2xl shadow-sm p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+            <h2 class="text-lg font-semibold text-foreground">月度排班</h2>
+            <div class="flex items-center gap-2">
+              <select id="year-select" class="h-9 px-2 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"></select>
+              <select id="month-select" class="h-9 px-2 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"></select>
+              <button type="button" id="prev-month" class="p-2 rounded-md hover:bg-muted text-muted-foreground" aria-label="上个月">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button type="button" id="next-month" class="p-2 rounded-md hover:bg-muted text-muted-foreground" aria-label="下个月">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-7 gap-1 text-center text-sm text-muted-foreground mb-2">
+            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1" id="calendar-grid"></div>
+        </section>
+
+        <aside class="space-y-6">
+          <section id="salary-summary" class="bg-card border border-border rounded-2xl shadow-sm p-5">
+            <h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <i data-lucide="wallet" class="w-5 h-5 text-primary"></i>工资概览
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-muted rounded-xl p-4">
+                <p class="text-xs text-muted-foreground mb-1">本月工时</p>
+                <p class="text-2xl font-semibold text-foreground" id="total-hours">0.0</p>
+                <p class="text-xs text-muted-foreground">小时</p>
+              </div>
+              <div class="bg-primary/10 rounded-xl p-4">
+                <p class="text-xs text-primary mb-1">预估工资</p>
+                <p class="text-2xl font-semibold text-primary" id="total-salary">¥0</p>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p class="text-sm text-muted-foreground mb-2">班次记录</p>
+              <ul id="shift-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></ul>
+            </div>
+            <div class="mt-5 border-t border-border pt-4">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-sm font-medium text-foreground">品牌汇总</p>
+                <button type="button" id="export-month" class="text-xs px-2 py-1 rounded bg-muted text-foreground hover:bg-primary/10 transition-colors">导出 CSV</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left" id="brand-summary">
+                  <thead>
+                    <tr class="text-muted-foreground border-b border-border">
+                      <th class="py-1 font-normal">品牌</th>
+                      <th class="py-1 font-normal text-right">工时</th>
+                      <th class="py-1 font-normal text-right">工资</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="add-shift-form" class="bg-card border border-border rounded-2xl shadow-sm p-5">
+            <h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <i data-lucide="plus-circle" class="w-5 h-5 text-primary"></i>添加班次
+            </h2>
+            <button type="button" id="voice-btn" class="mb-4 w-full h-10 rounded-lg border border-primary/30 bg-primary/5 text-primary text-sm font-medium hover:bg-primary/10 transition-colors flex items-center justify-center gap-2">
+              <i data-lucide="mic" class="w-4 h-4"></i>语音添加班次
+            </button>
+            <p id="voice-status" class="text-xs text-muted-foreground mb-3 hidden"></p>
+            <form id="shift-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-medium text-muted-foreground mb-1">日期</label>
+                <input type="date" name="date" required class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-muted-foreground mb-1">班次类型</label>
+                <select name="type" class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                  <option value="早班">早班</option>
+                  <option value="中班">中班</option>
+                  <option value="晚班">晚班</option>
+                  <option value="加班">加班</option>
+                  <option value="自定义">自定义</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-muted-foreground mb-1">品牌/商家</label>
+                <input type="text" name="brand" list="brand-suggestions" placeholder="例如：欧莱雅、兰蔻" class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                <datalist id="brand-suggestions"></datalist>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-muted-foreground mb-1">开始</label>
+                  <input type="time" name="start" required value="09:00" class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-muted-foreground mb-1">结束</label>
+                  <input type="time" name="end" required value="18:00" class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-muted-foreground mb-1">时薪 (¥)</label>
+                <input type="number" name="wage" min="0" step="0.1" required value="25" class="w-full h-10 px-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+              </div>
+              <button type="submit" class="w-full h-11 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">添加并计算</button>
+            </form>
+          </section>
+
+          <section id="shift-templates" class="bg-card border border-border rounded-2xl shadow-sm p-5">
+            <h2 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+              <i data-lucide="bookmark" class="w-5 h-5 text-primary"></i>班次模板
+            </h2>
+            <p class="text-xs text-muted-foreground mb-3">把常用的品牌、时间、时薪保存成模板，一键填充。</p>
+            <button type="button" id="save-template-btn" class="mb-3 w-full h-9 rounded-lg border border-border bg-background text-foreground text-sm hover:bg-muted transition-colors">把当前表单存为模板</button>
+            <div id="template-list" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+          </section>
+
+          <section id="salary-summary" class="bg-card border border-border rounded-2xl shadow-sm p-5">
+      </div>
+    </main>
+        <script>
+      (function () {
+        const calendarGrid = document.getElementById('calendar-grid');
+        const yearSelect = document.getElementById('year-select');
+        const monthSelect = document.getElementById('month-select');
+        const totalHoursEl = document.getElementById('total-hours');
+        const totalSalaryEl = document.getElementById('total-salary');
+        const shiftList = document.getElementById('shift-list');
+        const shiftForm = document.getElementById('shift-form');
+        const templateList = document.getElementById('template-list');
+        const saveTemplateBtn = document.getElementById('save-template-btn');
+        const voiceBtn = document.getElementById('voice-btn');
+        const voiceStatus = document.getElementById('voice-status');
+
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth();
+
+        const STORAGE_KEY = 'pink-schedule-shifts';
+        const TEMPLATE_KEY = 'pink-schedule-templates';
+
+        const DEFAULT_SHIFTS = [
+          { id: 1, date: '2026-08-05', type: '早班', brand: 'A品牌', start: '08:00', end: '16:00', wage: 30 },
+          { id: 2, date: '2026-08-12', type: '中班', brand: 'B品牌', start: '12:00', end: '20:00', wage: 32 },
+          { id: 3, date: '2026-08-19', type: '晚班', brand: 'A品牌', start: '14:00', end: '22:00', wage: 35 },
+          { id: 4, date: '2026-08-26', type: '加班', brand: 'C品牌', start: '09:00', end: '18:00', wage: 40 }
+        ];
+
+        function loadShifts() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              return parsed.map(s => ({ brand: '', ...s }));
+            }
+          } catch (e) {}
+          return DEFAULT_SHIFTS.map(s => ({ ...s }));
+        }
+
+        function saveShifts() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(shifts));
+          } catch (e) {}
+        }
+
+        function loadTemplates() {
+          try {
+            const raw = localStorage.getItem(TEMPLATE_KEY);
+            if (raw) return JSON.parse(raw);
+          } catch (e) {}
+          return [];
+        }
+
+        function saveTemplates(list) {
+          try {
+            localStorage.setItem(TEMPLATE_KEY, JSON.stringify(list));
+          } catch (e) {}
+        }
+
+        let shifts = loadShifts();
+        let templates = loadTemplates();
+
+        function initSelectors() {
+          const baseYear = today.getFullYear();
+          yearSelect.innerHTML = '';
+          for (let y = baseYear - 10; y <= baseYear + 10; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y + '年';
+            yearSelect.appendChild(opt);
+          }
+          monthSelect.innerHTML = '';
+          for (let m = 0; m < 12; m++) {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = (m + 1) + '月';
+            monthSelect.appendChild(opt);
+          }
+        }
+
+        function updateSelectors() {
+          yearSelect.value = currentYear;
+          monthSelect.value = currentMonth;
+        }
+
+        function parseMinutes(timeStr) {
+          const [h, m] = timeStr.split(':').map(Number);
+          return h * 60 + m;
+        }
+
+        function hoursBetween(start, end) {
+          let diff = parseMinutes(end) - parseMinutes(start);
+          if (diff <= 0) diff += 24 * 60;
+          return diff / 60;
+        }
+
+        function formatMoney(n) {
+          return '¥' + n.toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        function toISODate(y, m, d) {
+          return y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        }
+
+        function updateBrandSuggestions() {
+          const datalist = document.getElementById('brand-suggestions');
+          if (!datalist) return;
+          const brands = Array.from(new Set(shifts.map(s => s.brand).filter(Boolean))).sort();
+          datalist.innerHTML = brands.map(b => '<option value="' + b + '"></option>').join('');
+        }
+
+        function renderBrandSummary(containerId, filterFn, periodLabel) {
+          const tbody = document.querySelector('#' + containerId + ' tbody');
+          if (!tbody) return;
+          const groups = {};
+          let totalHours = 0;
+          shifts.filter(filterFn).forEach(s => {
+            const h = hoursBetween(s.start, s.end);
+            const brand = s.brand || '未填写';
+            if (!groups[brand]) groups[brand] = { hours: 0, salary: 0 };
+            groups[brand].hours += h;
+            groups[brand].salary += h * s.wage;
+            totalHours += h;
+          });
+          tbody.innerHTML = '';
+          Object.keys(groups).sort().forEach(brand => {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-border last:border-0';
+            row.innerHTML = '<td class="py-1.5 text-foreground">' + brand + '</td><td class="py-1.5 text-right text-foreground">' + groups[brand].hours.toFixed(1) + 'h</td><td class="py-1.5 text-right font-medium text-primary">' + formatMoney(groups[brand].salary) + '</td>';
+            tbody.appendChild(row);
+          });
+          if (totalHours === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="py-2 text-sm text-muted-foreground">' + periodLabel + '暂无记录</td></tr>';
+          }
+        }
+
+        function exportCSV(filename, rows) {
+          const csv = ['\uFEFF品牌,日期,班次,开始,结束,工时,时薪,工资'].concat(rows.map(r => {
+            const h = hoursBetween(r.start, r.end);
+            return [r.brand || '未填写', r.date, r.type, r.start, r.end, h.toFixed(2), r.wage, (h * r.wage).toFixed(2)].join(',');
+          })).join('\n');
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        function renderMonth(year, month) {
+          calendarGrid.innerHTML = '';
+          const firstDay = new Date(year, month, 1);
+          const startWeekday = firstDay.getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+          for (let i = 0; i < startWeekday; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'h-24 rounded-lg bg-muted/30';
+            calendarGrid.appendChild(cell);
+          }
+
+          for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = toISODate(year, month + 1, d);
+            const dayShifts = shifts.filter(s => s.date === dateStr);
+            const cell = document.createElement('div');
+            cell.className = 'min-h-24 rounded-lg border border-border bg-background p-2 flex flex-col gap-1 hover:shadow-sm transition-shadow';
+            const num = document.createElement('span');
+            num.className = 'text-sm font-medium text-foreground';
+            num.textContent = d;
+            cell.appendChild(num);
+            dayShifts.forEach(s => {
+              const chip = document.createElement('span');
+              chip.className = 'text-[10px] leading-tight px-1.5 py-0.5 rounded bg-primary/10 text-primary truncate';
+              chip.textContent = s.brand || s.type;
+              chip.title = (s.brand ? s.brand + ' ' : '') + s.type + ' ' + s.start + '-' + s.end;
+              cell.appendChild(chip);
+            });
+            calendarGrid.appendChild(cell);
+          }
+        }
+
+        function deleteShift(id) {
+          if (!confirm('确定要删除这条排班吗？')) return;
+          shifts = shifts.filter(s => s.id !== id);
+          saveShifts();
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+          renderTemplates();
+        }
+
+        function renderSummary() {
+          let totalHours = 0;
+          let totalSalary = 0;
+          const monthPrefix = currentYear + '-' + String(currentMonth + 1).padStart(2, '0');
+          shifts.forEach(s => {
+            if (!s.date.startsWith(monthPrefix)) return;
+            const h = hoursBetween(s.start, s.end);
+            totalHours += h;
+            totalSalary += h * s.wage;
+          });
+          totalHoursEl.textContent = totalHours.toFixed(1);
+          totalSalaryEl.textContent = formatMoney(totalSalary);
+
+          shiftList.innerHTML = '';
+          const monthShifts = shifts.filter(s => s.date.startsWith(monthPrefix)).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+          if (monthShifts.length === 0) {
+            shiftList.innerHTML = '<li class="text-sm text-muted-foreground">暂无班次，添加一条开始计算吧</li>';
+          } else {
+            monthShifts.forEach(s => {
+              const h = hoursBetween(s.start, s.end);
+              const li = document.createElement('li');
+              li.className = 'flex items-center justify-between text-sm p-2 rounded-lg bg-muted';
+              const brandTag = s.brand ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary mr-1.5">' + s.brand + '</span>' : '';
+              li.innerHTML = '<span class="text-foreground flex items-center">' + brandTag + s.date.slice(5) + ' ' + s.type + ' ' + s.start + '-' + s.end + '</span><span class="flex items-center gap-2"><span class="font-medium text-primary">' + formatMoney(h * s.wage) + '</span><button type="button" data-delete-id="' + s.id + '" class="p-1 rounded hover:bg-border text-muted-foreground" aria-label="删除"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button></span>';
+              shiftList.appendChild(li);
+            });
+            shiftList.addEventListener('click', function (e) {
+              const btn = e.target.closest('[data-delete-id]');
+              if (!btn) return;
+              deleteShift(parseInt(btn.getAttribute('data-delete-id'), 10));
+            }, { once: false });
+          }
+          renderBrandSummary('brand-summary', s => s.date.startsWith(monthPrefix), '本月');
+          updateBrandSuggestions();
+        }
+
+        function applyTemplate(idx) {
+          const t = templates[idx];
+          if (!t) return;
+          shiftForm.querySelector('[name="type"]').value = t.type;
+          shiftForm.querySelector('[name="brand"]').value = t.brand;
+          shiftForm.querySelector('[name="start"]').value = t.start;
+          shiftForm.querySelector('[name="end"]').value = t.end;
+          shiftForm.querySelector('[name="wage"]').value = t.wage;
+          shiftForm.querySelector('[name="date"]').focus();
+        }
+
+        function renderTemplates() {
+          templateList.innerHTML = '';
+          if (templates.length === 0) {
+            templateList.innerHTML = '<p class="text-sm text-muted-foreground">还没有模板</p>';
+            return;
+          }
+          templates.forEach((t, idx) => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between text-sm p-2 rounded-lg bg-muted';
+            div.innerHTML = '<span class="text-foreground truncate">' + (t.brand || '未填写') + ' · ' + t.type + ' · ' + t.start + '-' + t.end + ' · ¥' + t.wage + '</span><span class="flex items-center gap-1"><button type="button" data-apply-idx="' + idx + '" class="px-2 py-1 rounded bg-primary text-primary-foreground text-xs">使用</button><button type="button" data-del-template-idx="' + idx + '" class="px-2 py-1 rounded bg-border text-foreground text-xs">删除</button></span>';
+            templateList.appendChild(div);
+          });
+          templateList.addEventListener('click', function (e) {
+            const applyBtn = e.target.closest('[data-apply-idx]');
+            const delBtn = e.target.closest('[data-del-template-idx]');
+            if (applyBtn) applyTemplate(parseInt(applyBtn.getAttribute('data-apply-idx'), 10));
+            if (delBtn) {
+              const idx = parseInt(delBtn.getAttribute('data-del-template-idx'), 10);
+              templates.splice(idx, 1);
+              saveTemplates(templates);
+              renderTemplates();
+            }
+          }, { once: false });
+        }
+
+        saveTemplateBtn.addEventListener('click', function () {
+          const formData = new FormData(shiftForm);
+          templates.push({
+            id: Date.now(),
+            type: formData.get('type'),
+            brand: (formData.get('brand') || '').trim(),
+            start: formData.get('start'),
+            end: formData.get('end'),
+            wage: parseFloat(formData.get('wage')) || 0
+          });
+          saveTemplates(templates);
+          renderTemplates();
+          alert('已保存为模板');
+        });
+
+        function parseVoiceText(text) {
+          const result = { date: '', type: '', brand: '', start: '', end: '', wage: 0 };
+          const t = text.replace(/，/g, ' ').replace(/\./g, ':');
+
+          const typeMatch = t.match(/(早班|中班|晚班|加班|自定义)/);
+          if (typeMatch) result.type = typeMatch[1];
+
+          const dateMatch = t.match(/(?:(明年|下个?月|这个?月)\s*)?(?:(\d{1,2})月)?(\d{1,2})(?:[号日])/);
+          if (dateMatch) {
+            let y = currentYear;
+            let m = currentMonth + 1;
+            const relative = dateMatch[1] || '';
+            const monthPart = dateMatch[2];
+            const dayPart = parseInt(dateMatch[3], 10);
+            if (relative.includes('明年')) y = currentYear + 1;
+            if (relative.includes('下个月')) m = currentMonth + 2;
+            else if (relative.includes('这个月')) m = currentMonth + 1;
+            else if (monthPart) m = parseInt(monthPart, 10);
+            if (m > 12) { m -= 12; y += 1; }
+            result.date = toISODate(y, m, dayPart);
+          }
+
+          const brandPattern = /(?:\d{1,2}月)?\d{1,2}[号日]\s*([^早中晚加自\d\s]{2,}?)\s*(?:早班|中班|晚班|加班|自定义)/;
+          const brandMatch = t.match(brandPattern);
+          if (brandMatch) result.brand = brandMatch[1].trim();
+
+          const timeRegex = /(早上|上午|中午|下午|晚上|凌晨)?\s*(\d{1,2})[:点](\d{1,2}|半)?/g;
+          const times = [];
+          let mch;
+          while ((mch = timeRegex.exec(t)) !== null) {
+            let mer = mch[1] || '';
+            let h = parseInt(mch[2], 10);
+            let min = mch[3];
+            let minNum = 0;
+            if (min === '半') minNum = 30;
+            else if (min) minNum = parseInt(min, 10);
+            if ((mer === '下午' || mer === '晚上') && h < 12) h += 12;
+            if (mer === '中午' && h < 12) h += 12;
+            if (mer === '凌晨' && h >= 12) h -= 12;
+            times.push(String(h).padStart(2, '0') + ':' + String(minNum).padStart(2, '0'));
+          }
+          if (times.length >= 1) result.start = times[0];
+          if (times.length >= 2) result.end = times[1];
+
+          const wageMatch = t.match(/时薪?[\s为是]?+(\d+)/) || t.match(/(\d+)(?:块|元)(?:一?小时|每小时|时薪)/) || t.match(/(\d+)\s*(?:块|元)\s*$/);
+          if (wageMatch) result.wage = parseFloat(wageMatch[1]);
+
+          return result;
+        }
+
+        function startVoice() {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            alert('你的浏览器不支持语音识别，请手动输入');
+            return;
+          }
+          const rec = new SpeechRecognition();
+          rec.lang = 'zh-CN';
+          rec.interimResults = false;
+          rec.maxAlternatives = 1;
+          voiceStatus.classList.remove('hidden');
+          voiceStatus.textContent = '正在聆听，请说话...';
+          voiceBtn.classList.add('bg-primary/20');
+          rec.start();
+          rec.onresult = function (event) {
+            const text = event.results[0][0].transcript;
+            voiceStatus.textContent = '识别结果：' + text;
+            const parsed = parseVoiceText(text);
+            if (parsed.date) shiftForm.querySelector('[name="date"]').value = parsed.date;
+            if (parsed.type) shiftForm.querySelector('[name="type"]').value = parsed.type;
+            if (parsed.brand) shiftForm.querySelector('[name="brand"]').value = parsed.brand;
+            if (parsed.start) shiftForm.querySelector('[name="start"]').value = parsed.start;
+            if (parsed.end) shiftForm.querySelector('[name="end"]').value = parsed.end;
+            if (parsed.wage) shiftForm.querySelector('[name="wage"]').value = parsed.wage;
+            voiceBtn.classList.remove('bg-primary/20');
+          };
+          rec.onerror = function (event) {
+            voiceStatus.textContent = '识别失败：' + event.error;
+            voiceBtn.classList.remove('bg-primary/20');
+          };
+          rec.onend = function () {
+            voiceBtn.classList.remove('bg-primary/20');
+          };
+        }
+
+        voiceBtn.addEventListener('click', startVoice);
+
+        shiftForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const formData = new FormData(shiftForm);
+          const date = formData.get('date');
+          const start = formData.get('start');
+          const end = formData.get('end');
+          if (!date) { alert('请选择日期'); return; }
+          if (hoursBetween(start, end) <= 0) {
+            alert('结束时间必须晚于开始时间');
+            return;
+          }
+          shifts.push({
+            id: Date.now(),
+            date,
+            type: formData.get('type'),
+            brand: (formData.get('brand') || '').trim(),
+            start,
+            end,
+            wage: parseFloat(formData.get('wage')) || 0
+          });
+          saveShifts();
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+          shiftForm.reset();
+          shiftForm.querySelector('[name="start"]').value = '09:00';
+          shiftForm.querySelector('[name="end"]').value = '18:00';
+          shiftForm.querySelector('[name="wage"]').value = '25';
+          updateBrandSuggestions();
+          if (window.lucide) lucide.createIcons();
+        });
+
+        yearSelect.addEventListener('change', function () {
+          currentYear = parseInt(yearSelect.value, 10);
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+        });
+        monthSelect.addEventListener('change', function () {
+          currentMonth = parseInt(monthSelect.value, 10);
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+        });
+
+        document.getElementById('prev-month').addEventListener('click', function () {
+          currentMonth--;
+          if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+          updateSelectors();
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+        });
+        document.getElementById('next-month').addEventListener('click', function () {
+          currentMonth++;
+          if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+          updateSelectors();
+          renderMonth(currentYear, currentMonth);
+          renderSummary();
+        });
+        document.getElementById('export-month').addEventListener('click', function () {
+          const monthPrefix = currentYear + '-' + String(currentMonth + 1).padStart(2, '0');
+          const rows = shifts.filter(s => s.date.startsWith(monthPrefix)).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+          exportCSV('月度排班汇总_' + monthPrefix + '.csv', rows);
+        });
+
+        initSelectors();
+        updateSelectors();
+        renderMonth(currentYear, currentMonth);
+        renderSummary();
+        renderTemplates();
+      })();
+    </script>
+    <script>lucide.createIcons();</script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('../sw.js', { scope: './' });
+      }
+    </script>
+</body>
+</html>

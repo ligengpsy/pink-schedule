@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preflight</title>
+    <style id="theme-vars">
+/* Sakura pink theme tokens */
+:root {
+  /* Core semantic aliases expected by apply-html-head-contract */
+  --sakura-background: #FFF6F8;
+  --sakura-foreground: #4A3B40;
+  --sakura-card: #FFFFFF;
+  --sakura-card-foreground: #4A3B40;
+  --sakura-popover: #FFFFFF;
+  --sakura-popover-foreground: #4A3B40;
+  --sakura-primary: #F46FAE;
+  --sakura-primary-foreground: #FFFFFF;
+  --sakura-muted: #FCE7EE;
+  --sakura-muted-foreground: #8F6F78;
+  --sakura-border: #F8D0E0;
+  --sakura-input: #F8D0E0;
+  --sakura-ring: #F46FAE;
+
+  /* Radius scale */
+  --sakura-radius-sm: 6px;
+  --sakura-radius-md: 10px;
+  --sakura-radius-lg: 16px;
+
+  /* Visual experience tokens */
+  --sakura-surface: #FFFFFF;
+  --sakura-surface-2: #FCE7EE;
+  --sakura-ink: #4A3B40;
+  --sakura-ink-2: #7A5F66;
+  --sakura-ink-3: #A58891;
+  --sakura-line: #F8D0E0;
+  --sakura-brand: #F46FAE;
+  --sakura-brand-ink: #FFFFFF;
+  --sakura-state-success: #34D399;
+  --sakura-state-warning: #FBBF24;
+  --sakura-state-error: #FB7185;
+  --sakura-state-info: #60A5FA;
+
+  /* Spacing */
+  --sakura-s-1: 4px;
+  --sakura-s-2: 8px;
+  --sakura-s-3: 12px;
+  --sakura-s-4: 16px;
+  --sakura-s-5: 24px;
+  --sakura-s-6: 32px;
+  --sakura-s-7: 48px;
+  --sakura-s-8: 64px;
+
+  /* Typography */
+  --sakura-font-sans: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --sakura-font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Shadows */
+  --sakura-shadow-1: 0 1px 2px rgba(74, 59, 64, 0.05), 0 1px 1px rgba(74, 59, 64, 0.03);
+  --sakura-shadow-2: 0 8px 24px -8px rgba(74, 59, 64, 0.14);
+}
+
+html,
+body {
+  font-family: var(--sakura-font-sans);
+  color: var(--sakura-ink);
+  background: var(--sakura-background);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--sakura-background);
+    --color-foreground: var(--sakura-foreground);
+    --color-card: var(--sakura-card);
+    --color-card-foreground: var(--sakura-card-foreground);
+    --color-popover: var(--sakura-popover);
+    --color-popover-foreground: var(--sakura-popover-foreground);
+    --color-primary: var(--sakura-primary);
+    --color-primary-foreground: var(--sakura-primary-foreground);
+    --color-muted: var(--sakura-muted);
+    --color-muted-foreground: var(--sakura-muted-foreground);
+    --color-border: var(--sakura-border);
+    --color-input: var(--sakura-input);
+    --color-ring: var(--sakura-ring);
+    --radius-sm: var(--sakura-radius-sm);
+    --radius-md: var(--sakura-radius-md);
+    --radius-lg: var(--sakura-radius-lg);
+  }
+  @layer base {
+    body { background: var(--sakura-background); color: var(--sakura-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--sakura-background); }
+      .text-background { color: var(--sakura-background); }
+      .border-background { border-color: var(--sakura-background); }
+      .ring-background { --tw-ring-color: var(--sakura-background); }
+      .bg-foreground { background-color: var(--sakura-foreground); }
+      .text-foreground { color: var(--sakura-foreground); }
+      .border-foreground { border-color: var(--sakura-foreground); }
+      .ring-foreground { --tw-ring-color: var(--sakura-foreground); }
+      .bg-card { background-color: var(--sakura-card); }
+      .text-card { color: var(--sakura-card); }
+      .border-card { border-color: var(--sakura-card); }
+      .ring-card { --tw-ring-color: var(--sakura-card); }
+      .bg-card-foreground { background-color: var(--sakura-card-foreground); }
+      .text-card-foreground { color: var(--sakura-card-foreground); }
+      .border-card-foreground { border-color: var(--sakura-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--sakura-card-foreground); }
+      .bg-popover { background-color: var(--sakura-popover); }
+      .text-popover { color: var(--sakura-popover); }
+      .border-popover { border-color: var(--sakura-popover); }
+      .ring-popover { --tw-ring-color: var(--sakura-popover); }
+      .bg-popover-foreground { background-color: var(--sakura-popover-foreground); }
+      .text-popover-foreground { color: var(--sakura-popover-foreground); }
+      .border-popover-foreground { border-color: var(--sakura-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--sakura-popover-foreground); }
+      .bg-primary { background-color: var(--sakura-primary); }
+      .text-primary { color: var(--sakura-primary); }
+      .border-primary { border-color: var(--sakura-primary); }
+      .ring-primary { --tw-ring-color: var(--sakura-primary); }
+      .bg-primary-foreground { background-color: var(--sakura-primary-foreground); }
+      .text-primary-foreground { color: var(--sakura-primary-foreground); }
+      .border-primary-foreground { border-color: var(--sakura-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--sakura-primary-foreground); }
+      .bg-muted { background-color: var(--sakura-muted); }
+      .text-muted { color: var(--sakura-muted); }
+      .border-muted { border-color: var(--sakura-muted); }
+      .ring-muted { --tw-ring-color: var(--sakura-muted); }
+      .bg-muted-foreground { background-color: var(--sakura-muted-foreground); }
+      .text-muted-foreground { color: var(--sakura-muted-foreground); }
+      .border-muted-foreground { border-color: var(--sakura-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--sakura-muted-foreground); }
+      .bg-border { background-color: var(--sakura-border); }
+      .text-border { color: var(--sakura-border); }
+      .border-border { border-color: var(--sakura-border); }
+      .ring-border { --tw-ring-color: var(--sakura-border); }
+      .bg-input { background-color: var(--sakura-input); }
+      .text-input { color: var(--sakura-input); }
+      .border-input { border-color: var(--sakura-input); }
+      .ring-input { --tw-ring-color: var(--sakura-input); }
+      .bg-ring { background-color: var(--sakura-ring); }
+      .text-ring { color: var(--sakura-ring); }
+      .border-ring { border-color: var(--sakura-ring); }
+      .ring-ring { --tw-ring-color: var(--sakura-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

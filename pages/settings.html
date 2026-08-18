@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - 排班小助手</title>
+  <meta name="theme-color" content="#F46FAE">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../icon.svg">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --color-background: var(--sakura-background);
+      --color-foreground: var(--sakura-foreground);
+      --color-card: var(--sakura-card);
+      --color-card-foreground: var(--sakura-card-foreground);
+      --color-primary: var(--sakura-primary);
+      --color-primary-foreground: var(--sakura-primary-foreground);
+      --color-muted: var(--sakura-muted);
+      --color-muted-foreground: var(--sakura-muted-foreground);
+      --color-border: var(--sakura-border);
+      --color-input: var(--sakura-input);
+      --color-ring: var(--sakura-ring);
+      --radius-sm: var(--sakura-radius-sm);
+      --radius-md: var(--sakura-radius-md);
+      --radius-lg: var(--sakura-radius-lg);
+    }
+  </style>
+  <style>
+    .bg-background { background-color: var(--sakura-background); }
+    .text-foreground { color: var(--sakura-foreground); }
+    .bg-card { background-color: var(--sakura-card); }
+    .bg-primary { background-color: var(--sakura-primary); }
+    .text-primary { color: var(--sakura-primary); }
+    .text-primary-foreground { color: var(--sakura-primary-foreground); }
+    .bg-muted { background-color: var(--sakura-muted); }
+    .text-muted-foreground { color: var(--sakura-muted-foreground); }
+    .border-border { border-color: var(--sakura-border); }
+    .border-input { border-color: var(--sakura-input); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
+    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
+          <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+        </div>
+        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="badge badge-primary ml-1" id="user-badge"></span>
+      </div>
+      <div class="flex items-center gap-1">
+        <a href="month.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">月视图</a>
+        <a href="week.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">周视图</a>
+        <a href="dashboard.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">统计</a>
+        <a href="settings.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md"><i data-lucide="moon" class="w-4 h-4"></i></button>
+        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4"></i>AI</button>
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-full max-w-[640px] mx-auto px-4 md:px-6 py-6 space-y-6">
+    <h1 class="text-xl font-bold" style="color: var(--sakura-foreground)">设置</h1>
+
+    <section class="card p-5">
+      <h2 class="text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--sakura-foreground)">
+        <i data-lucide="sparkles" class="w-5 h-5" style="color: var(--sakura-primary)"></i>AI 配置
+      </h2>
+      <p class="text-xs mb-4" style="color: var(--sakura-muted-foreground)">配置 AI API 后，AI助手可提供智能排班建议、工资分析、冲突检测等功能。兼容 OpenAI 格式的 API 均可使用。</p>
+      <form id="ai-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">API 地址</label>
+          <input type="text" name="aiApiUrl" placeholder="https://api.openai.com/v1/chat/completions" class="input-field">
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">API 密钥</label>
+          <input type="password" name="aiApiKey" placeholder="sk-..." class="input-field">
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">模型</label>
+          <input type="text" name="aiModel" placeholder="gpt-4o-mini" class="input-field">
+        </div>
+        <button type="submit" class="btn-primary w-full font-medium" style="height: 40px">保存AI配置</button>
+      </form>
+    </section>
+
+    <section class="card p-5">
+      <h2 class="text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--sakura-foreground)">
+        <i data-lucide="settings" class="w-5 h-5" style="color: var(--sakura-primary)"></i>工资规则
+      </h2>
+      <form id="rules-form" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">加班门槛 (小时/天)</label>
+            <input type="number" name="overtimeThreshold" min="0" step="0.5" class="input-field">
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">加班倍率</label>
+            <input type="number" name="overtimeRate" min="1" step="0.1" class="input-field">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">税率 (%)</label>
+          <input type="number" name="taxRate" min="0" max="100" step="0.1" value="0" class="input-field">
+        </div>
+        <button type="submit" class="btn-primary w-full font-medium" style="height: 40px">保存规则</button>
+      </form>
+    </section>
+
+    <section class="card p-5">
+      <h2 class="text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--sakura-foreground)">
+        <i data-lucide="palette" class="w-5 h-5" style="color: var(--sakura-primary)"></i>外观
+      </h2>
+      <div class="flex items-center justify-between">
+        <span class="text-sm" style="color: var(--sakura-foreground)">深色模式</span>
+        <button id="dark-toggle" class="w-12 h-6 rounded-full p-0.5 transition-colors" style="background: var(--sakura-muted)">
+          <div class="w-5 h-5 rounded-full transition-transform" style="background: var(--sakura-primary)"></div>
+        </button>
+      </div>
+    </section>
+
+    <section class="card p-5">
+      <h2 class="text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--sakura-foreground)">
+        <i data-lucide="database" class="w-5 h-5" style="color: var(--sakura-primary)"></i>数据管理
+      </h2>
+      <div class="space-y-3">
+        <button id="export-all" class="btn-ghost border w-full rounded-md text-sm p-2.5 flex items-center justify-center gap-2" style="border-color: var(--sakura-border)">
+          <i data-lucide="download" class="w-4 h-4"></i>导出全部数据
+        </button>
+        <button id="import-btn" class="btn-ghost border w-full rounded-md text-sm p-2.5 flex items-center justify-center gap-2" style="border-color: var(--sakura-border)">
+          <i data-lucide="upload" class="w-4 h-4"></i>导入数据
+        </button>
+        <input type="file" id="import-file" accept=".json" class="hidden">
+        <button id="clear-data" class="w-full rounded-md text-sm p-2.5 flex items-center justify-center gap-2" style="background: rgba(251,113,133,.1); color: var(--sakura-state-error)">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>清空所有数据
+        </button>
+      </div>
+    </section>
+
+    <div class="text-center text-xs pb-6" style="color: var(--sakura-ink-3)">
+      <p>Pink Schedule v2.0</p>
+      <p>粉色主题 · AI智能 · 月/周视图 · 统计分析</p>
+    </div>
+  </main>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/store.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/ai.js"></script>
+  <script src="../assets/js/ai-panel.js"></script>
+  <script>
+    Auth.requireAuth();
+    Utils.initTheme();
+
+    document.getElementById('user-badge').textContent = Auth.getCurrentUser().name;
+    document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+    document.getElementById('ai-toggle').addEventListener('click', () => AIPanel.toggle());
+
+    const settings = Store.loadSettings();
+
+    const aiForm = document.getElementById('ai-form');
+    aiForm.querySelector('[name="aiApiUrl"]').value = settings.aiApiUrl || '';
+    aiForm.querySelector('[name="aiApiKey"]').value = settings.aiApiKey || '';
+    aiForm.querySelector('[name="aiModel"]').value = settings.aiModel || '';
+    aiForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(aiForm);
+      const s = Store.loadSettings();
+      s.aiApiUrl = fd.get('aiApiUrl');
+      s.aiApiKey = fd.get('aiApiKey');
+      s.aiModel = fd.get('aiModel');
+      Store.saveSettings(s);
+      Utils.showToast('AI配置已保存');
+    });
+
+    const rulesForm = document.getElementById('rules-form');
+    rulesForm.querySelector('[name="overtimeThreshold"]').value = settings.overtimeThreshold;
+    rulesForm.querySelector('[name="overtimeRate"]').value = settings.overtimeRate;
+    rulesForm.querySelector('[name="taxRate"]').value = settings.taxRate;
+    rulesForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(rulesForm);
+      const s = Store.loadSettings();
+      s.overtimeThreshold = parseFloat(fd.get('overtimeThreshold')) || 8;
+      s.overtimeRate = parseFloat(fd.get('overtimeRate')) || 1.5;
+      s.taxRate = parseFloat(fd.get('taxRate')) || 0;
+      Store.saveSettings(s);
+      Utils.showToast('规则已保存');
+    });
+
+    const darkToggle = document.getElementById('dark-toggle');
+    const darkKnob = darkToggle.querySelector('div');
+    function updateDarkUI() {
+      const isDark = document.documentElement.classList.contains('dark');
+      darkToggle.style.background = isDark ? 'var(--sakura-primary)' : 'var(--sakura-muted)';
+      darkKnob.style.transform = isDark ? 'translateX(24px)' : 'translateX(0)';
+    }
+    updateDarkUI();
+    darkToggle.addEventListener('click', () => {
+      Utils.toggleTheme();
+      updateDarkUI();
+    });
+    document.getElementById('theme-toggle').addEventListener('click', () => { Utils.toggleTheme(); updateDarkUI(); });
+
+    document.getElementById('export-all').addEventListener('click', () => {
+      const data = Store.exportAll();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pink-schedule-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      Utils.showToast('已导出');
+    });
+
+    document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
+    document.getElementById('import-file').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          Store.importAll(data);
+          Utils.showToast('导入成功');
+        } catch (err) {
+          Utils.showToast('导入失败: 文件格式错误');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('clear-data').addEventListener('click', () => {
+      if (!confirm('确定清空所有排班数据？此操作不可撤销！')) return;
+      if (!confirm('再次确认：所有班次、模板将被删除！')) return;
+      Store.clearAll();
+      Utils.showToast('已清空');
+    });
+  </script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

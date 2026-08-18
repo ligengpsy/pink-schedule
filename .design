@@ -1,0 +1,81 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "月度排班",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1786971644000,
+      "canvasData": {
+        "x": 60,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3125,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-413bb4e5",
+          "measuredAt": 1787059151680
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": [
+          {
+            "domId": "tab-month-index",
+            "type": "navigate",
+            "targetPageId": "page-index",
+            "hideEdge": false
+          },
+          {
+            "domId": "tab-week-index",
+            "type": "navigate",
+            "targetPageId": "page-week",
+            "hideEdge": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-week",
+      "title": "周排班",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1786971644000,
+      "canvasData": {
+        "x": 60,
+        "y": 474,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3251,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-2fa85ac4",
+          "measuredAt": 1787059151680
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/week.html",
+        "interactions": [
+          {
+            "domId": "tab-month-week",
+            "type": "navigate",
+            "targetPageId": "page-index",
+            "hideEdge": false
+          },
+          {
+            "domId": "tab-week-week",
+            "type": "navigate",
+            "targetPageId": "page-week",
+            "hideEdge": false
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "粉色排班工资表"
+  }
+}

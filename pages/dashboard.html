@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>统计面板 - 排班小助手</title>
+  <meta name="theme-color" content="#F46FAE">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../icon.svg">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --color-background: var(--sakura-background);
+      --color-foreground: var(--sakura-foreground);
+      --color-card: var(--sakura-card);
+      --color-card-foreground: var(--sakura-card-foreground);
+      --color-primary: var(--sakura-primary);
+      --color-primary-foreground: var(--sakura-primary-foreground);
+      --color-muted: var(--sakura-muted);
+      --color-muted-foreground: var(--sakura-muted-foreground);
+      --color-border: var(--sakura-border);
+      --color-input: var(--sakura-input);
+      --color-ring: var(--sakura-ring);
+      --radius-sm: var(--sakura-radius-sm);
+      --radius-md: var(--sakura-radius-md);
+      --radius-lg: var(--sakura-radius-lg);
+    }
+  </style>
+  <style>
+    .bg-background { background-color: var(--sakura-background); }
+    .text-foreground { color: var(--sakura-foreground); }
+    .bg-card { background-color: var(--sakura-card); }
+    .bg-primary { background-color: var(--sakura-primary); }
+    .text-primary { color: var(--sakura-primary); }
+    .text-primary-foreground { color: var(--sakura-primary-foreground); }
+    .bg-muted { background-color: var(--sakura-muted); }
+    .text-muted-foreground { color: var(--sakura-muted-foreground); }
+    .border-border { border-color: var(--sakura-border); }
+    .bg-primary\/10 { background-color: rgba(244,111,174,.1); }
+    .bg-muted\/30 { background-color: rgba(252,231,238,.3); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
+    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
+          <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+        </div>
+        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="badge badge-primary ml-1" id="user-badge"></span>
+      </div>
+      <div class="flex items-center gap-1">
+        <a href="month.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">月视图</a>
+        <a href="week.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">周视图</a>
+        <a href="dashboard.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">统计</a>
+        <a href="settings.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md"><i data-lucide="moon" class="w-4 h-4"></i></button>
+        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4"></i>AI</button>
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-full max-w-[1280px] mx-auto px-4 md:px-6 py-6">
+    <h1 class="text-xl font-bold mb-6" style="color: var(--sakura-foreground)">统计面板</h1>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="clock" class="w-4 h-4" style="color: var(--sakura-primary)"></i>
+          <span class="text-xs" style="color: var(--sakura-muted-foreground)">总工时</span>
+        </div>
+        <p class="text-2xl font-bold" id="stat-total-hours" style="color: var(--sakura-foreground)">0.0h</p>
+      </div>
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="wallet" class="w-4 h-4" style="color: var(--sakura-primary)"></i>
+          <span class="text-xs" style="color: var(--sakura-muted-foreground)">总工资</span>
+        </div>
+        <p class="text-2xl font-bold" style="color: var(--sakura-primary)" id="stat-total-salary">¥0</p>
+      </div>
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="calendar-days" class="w-4 h-4" style="color: var(--sakura-primary)"></i>
+          <span class="text-xs" style="color: var(--sakura-muted-foreground)">总班次</span>
+        </div>
+        <p class="text-2xl font-bold" id="stat-total-shifts" style="color: var(--sakura-foreground)">0</p>
+      </div>
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="trending-up" class="w-4 h-4" style="color: var(--sakura-primary)"></i>
+          <span class="text-xs" style="color: var(--sakura-muted-foreground)">平均时薪</span>
+        </div>
+        <p class="text-2xl font-bold" id="stat-avg-wage" style="color: var(--sakura-foreground)">¥0/h</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <section class="card p-5">
+        <h2 class="text-base font-semibold mb-4" style="color: var(--sakura-foreground)">近6个月工时趋势</h2>
+        <div class="chart-bar mb-8" id="chart-hours"></div>
+      </section>
+      <section class="card p-5">
+        <h2 class="text-base font-semibold mb-4" style="color: var(--sakura-foreground)">近6个月工资趋势</h2>
+        <div class="chart-bar mb-8" id="chart-salary"></div>
+      </section>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <section class="card p-5">
+        <h2 class="text-base font-semibold mb-4" style="color: var(--sakura-foreground)">品牌分布</h2>
+        <div id="brand-chart" class="space-y-3"></div>
+      </section>
+      <section class="card p-5">
+        <h2 class="text-base font-semibold mb-4" style="color: var(--sakura-foreground)">班次类型分布</h2>
+        <div id="type-chart" class="space-y-3"></div>
+      </section>
+    </div>
+
+    <section class="card p-5">
+      <h2 class="text-base font-semibold mb-4" style="color: var(--sakura-foreground)">详细记录</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left" id="detail-table">
+          <thead>
+            <tr style="color: var(--sakura-muted-foreground); border-bottom: 1px solid var(--sakura-border)">
+              <th class="py-2 font-normal">日期</th><th class="py-2 font-normal">班次</th>
+              <th class="py-2 font-normal">品牌</th><th class="py-2 font-normal">时间</th>
+              <th class="py-2 font-normal text-right">工时</th><th class="py-2 font-normal text-right">时薪</th>
+              <th class="py-2 font-normal text-right">工资</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/store.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/ai.js"></script>
+  <script src="../assets/js/ai-panel.js"></script>
+  <script>
+    Auth.requireAuth();
+    Utils.initTheme();
+
+    document.getElementById('user-badge').textContent = Auth.getCurrentUser().name;
+    document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+    document.getElementById('theme-toggle').addEventListener('click', () => { Utils.toggleTheme(); location.reload(); });
+    document.getElementById('ai-toggle').addEventListener('click', () => AIPanel.toggle());
+
+    (function() {
+      const shifts = Store.loadShifts();
+      let totalHours = 0, totalSalary = 0;
+      shifts.forEach(s => {
+        const h = Utils.hoursBetween(s.start, s.end);
+        totalHours += h;
+        totalSalary += h * s.wage;
+      });
+
+      document.getElementById('stat-total-hours').textContent = totalHours.toFixed(1) + 'h';
+      document.getElementById('stat-total-salary').textContent = Utils.formatMoney(totalSalary);
+      document.getElementById('stat-total-shifts').textContent = shifts.length;
+      document.getElementById('stat-avg-wage').textContent = totalHours > 0 ? '¥' + (totalSalary / totalHours).toFixed(1) + '/h' : '¥0/h';
+
+      const now = new Date();
+      const monthHours = [];
+      const monthSalaries = [];
+      const monthLabels = [];
+      for (let i = 5; i >= 0; i--) {
+        const y = now.getFullYear();
+        const m = now.getMonth() - i;
+        const date = new Date(y, m, 1);
+        const stats = Utils.getMonthStats(shifts, date.getFullYear(), date.getMonth() + 1);
+        monthHours.push(stats.totalHours);
+        monthSalaries.push(stats.totalSalary);
+        monthLabels.push((date.getMonth() + 1) + '月');
+      }
+
+      function renderBarChart(containerId, values, labels, color) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const maxVal = Math.max(...values, 1);
+        values.forEach((v, i) => {
+          const bar = document.createElement('div');
+          bar.className = 'chart-bar-item';
+          bar.style.height = (v / maxVal * 100) + '%';
+          bar.style.background = color;
+          bar.setAttribute('data-label', labels[i]);
+          bar.title = labels[i] + ': ' + (containerId === 'chart-hours' ? v.toFixed(1) + 'h' : '¥' + v.toFixed(0));
+          container.appendChild(bar);
+        });
+      }
+      renderBarChart('chart-hours', monthHours, monthLabels, 'var(--sakura-primary)');
+      renderBarChart('chart-salary', monthSalaries, monthLabels, 'var(--sakura-state-info)');
+
+      const brandGroups = Utils.groupBy(shifts, s => s.brand || '未填写');
+      const brandData = Object.keys(brandGroups).map(b => ({
+        brand: b,
+        hours: brandGroups[b].reduce((sum, s) => sum + Utils.hoursBetween(s.start, s.end), 0),
+        salary: brandGroups[b].reduce((sum, s) => sum + Utils.hoursBetween(s.start, s.end) * s.wage, 0),
+        count: brandGroups[b].length
+      })).sort((a, b) => b.hours - a.hours);
+
+      const brandChart = document.getElementById('brand-chart');
+      const maxBrandHours = Math.max(...brandData.map(d => d.hours), 1);
+      brandChart.innerHTML = brandData.map(d => `
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span style="color: var(--sakura-foreground)">${d.brand}</span>
+            <span style="color: var(--sakura-muted-foreground)">${d.hours.toFixed(1)}h · ${Utils.formatMoney(d.salary)}</span>
+          </div>
+          <div class="h-2 rounded-full overflow-hidden" style="background: var(--sakura-muted)">
+            <div class="h-full rounded-full" style="width: ${d.hours / maxBrandHours * 100}%; background: var(--sakura-primary)"></div>
+          </div>
+        </div>
+      `).join('') || '<p class="text-sm" style="color: var(--sakura-muted-foreground)">暂无数据</p>';
+
+      const typeGroups = Utils.groupBy(shifts, s => s.type);
+      const typeData = Object.keys(typeGroups).map(t => ({
+        type: t,
+        hours: typeGroups[t].reduce((sum, s) => sum + Utils.hoursBetween(s.start, s.end), 0),
+        count: typeGroups[t].length
+      })).sort((a, b) => b.hours - a.hours);
+      const typeColors = { '早班': '#FBBF24', '中班': '#60A5FA', '晚班': '#A78BFA', '加班': '#34D399', '自定义': '#FB7185' };
+
+      const typeChart = document.getElementById('type-chart');
+      const maxTypeHours = Math.max(...typeData.map(d => d.hours), 1);
+      typeChart.innerHTML = typeData.map(d => `
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span style="color: var(--sakura-foreground)">${d.type}</span>
+            <span style="color: var(--sakura-muted-foreground)">${d.hours.toFixed(1)}h · ${d.count}次</span>
+          </div>
+          <div class="h-2 rounded-full overflow-hidden" style="background: var(--sakura-muted)">
+            <div class="h-full rounded-full" style="width: ${d.hours / maxTypeHours * 100}%; background: ${typeColors[d.type] || '#F46FAE'}"></div>
+          </div>
+        </div>
+      `).join('') || '<p class="text-sm" style="color: var(--sakura-muted-foreground)">暂无数据</p>';
+
+      const tbody = document.querySelector('#detail-table tbody');
+      const sorted = [...shifts].sort((a, b) => b.date.localeCompare(a.date) || a.start.localeCompare(b.start));
+      tbody.innerHTML = sorted.map(s => {
+        const h = Utils.hoursBetween(s.start, s.end);
+        return `<tr style="border-bottom: 1px solid var(--sakura-border)">
+          <td class="py-2">${s.date}</td><td class="py-2">${s.type}</td>
+          <td class="py-2">${s.brand || '-'}</td><td class="py-2">${s.start}-${s.end}</td>
+          <td class="py-2 text-right">${h.toFixed(1)}h</td><td class="py-2 text-right">¥${s.wage}</td>
+          <td class="py-2 text-right font-medium" style="color: var(--sakura-primary)">${Utils.formatMoney(h * s.wage)}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="7" class="py-4 text-center" style="color: var(--sakura-muted-foreground)">暂无数据</td></tr>';
+    })();
+  </script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

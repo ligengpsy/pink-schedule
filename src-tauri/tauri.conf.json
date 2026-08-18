@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "粉色排班工资表",
+  "identifier": "com.example.pinkschedule",
+  "build": {
+    "devUrl": "http://localhost:8080",
+    "frontendDist": "../pages"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "粉色排班工资表",
+        "width": 1280,
+        "height": 860,
+        "minWidth": 960,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app", "msi", "exe"]
+  }
+}

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周排班 - 排班小助手</title>
+  <meta name="theme-color" content="#F46FAE">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../icon.svg">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --color-background: var(--sakura-background);
+      --color-foreground: var(--sakura-foreground);
+      --color-card: var(--sakura-card);
+      --color-card-foreground: var(--sakura-card-foreground);
+      --color-primary: var(--sakura-primary);
+      --color-primary-foreground: var(--sakura-primary-foreground);
+      --color-muted: var(--sakura-muted);
+      --color-muted-foreground: var(--sakura-muted-foreground);
+      --color-border: var(--sakura-border);
+      --color-input: var(--sakura-input);
+      --color-ring: var(--sakura-ring);
+      --radius-sm: var(--sakura-radius-sm);
+      --radius-md: var(--sakura-radius-md);
+      --radius-lg: var(--sakura-radius-lg);
+    }
+  </style>
+  <style>
+    .bg-background { background-color: var(--sakura-background); }
+    .text-foreground { color: var(--sakura-foreground); }
+    .bg-card { background-color: var(--sakura-card); }
+    .bg-primary { background-color: var(--sakura-primary); }
+    .text-primary { color: var(--sakura-primary); }
+    .text-primary-foreground { color: var(--sakura-primary-foreground); }
+    .bg-muted { background-color: var(--sakura-muted); }
+    .text-muted-foreground { color: var(--sakura-muted-foreground); }
+    .border-border { border-color: var(--sakura-border); }
+    .hover\:bg-muted:hover { background-color: var(--sakura-muted); }
+    .bg-primary\/10 { background-color: rgba(244,111,174,.1); }
+    .bg-muted\/30 { background-color: rgba(252,231,238,.3); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
+    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
+          <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+        </div>
+        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="badge badge-primary ml-1" id="user-badge"></span>
+      </div>
+      <div class="flex items-center gap-1">
+        <a href="month.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">月视图</a>
+        <a href="week.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">周视图</a>
+        <a href="dashboard.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">统计</a>
+        <a href="settings.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md"><i data-lucide="moon" class="w-4 h-4"></i></button>
+        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4"></i>AI</button>
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="w-full max-w-[1280px] mx-auto px-4 md:px-6 py-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <button id="prev-week" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+        <h1 class="text-lg font-semibold" id="week-label" style="color: var(--sakura-foreground)">本周排班</h1>
+        <button id="next-week" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+        <button id="this-week-btn" class="btn-ghost px-3 py-1.5 rounded-md text-sm">本周</button>
+      </div>
+      <button id="export-week" class="btn-ghost px-3 py-1.5 rounded-md text-sm flex items-center gap-1"><i data-lucide="download" class="w-4 h-4"></i>导出</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-7 gap-3" id="week-grid"></div>
+
+    <section class="card p-5 mt-6">
+      <h2 class="text-base font-semibold mb-4 flex items-center gap-2">
+        <i data-lucide="bar-chart-3" class="w-5 h-5" style="color: var(--sakura-primary)"></i>本周概览
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="rounded-xl p-3" style="background: var(--sakura-muted)">
+          <p class="text-xs mb-1" style="color: var(--sakura-muted-foreground)">总工时</p>
+          <p class="text-xl font-bold" id="week-hours">0.0h</p>
+        </div>
+        <div class="rounded-xl p-3" style="background: rgba(244,111,174,.1)">
+          <p class="text-xs mb-1" style="color: var(--sakura-primary)">预估工资</p>
+          <p class="text-xl font-bold" style="color: var(--sakura-primary)" id="week-salary">¥0</p>
+        </div>
+        <div class="rounded-xl p-3" style="background: var(--sakura-muted)">
+          <p class="text-xs mb-1" style="color: var(--sakura-muted-foreground)">班次数</p>
+          <p class="text-xl font-bold" id="week-count">0</p>
+        </div>
+        <div class="rounded-xl p-3" style="background: var(--sakura-muted)">
+          <p class="text-xs mb-1" style="color: var(--sakura-muted-foreground)">休息天</p>
+          <p class="text-xl font-bold" id="week-rest">7</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/store.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/ai.js"></script>
+  <script src="../assets/js/ai-panel.js"></script>
+  <script>
+    Auth.requireAuth();
+    Utils.initTheme();
+
+    document.getElementById('user-badge').textContent = Auth.getCurrentUser().name;
+    document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+    document.getElementById('theme-toggle').addEventListener('click', () => { Utils.toggleTheme(); location.reload(); });
+    document.getElementById('ai-toggle').addEventListener('click', () => AIPanel.toggle());
+
+    (function() {
+      const grid = document.getElementById('week-grid');
+      let weekStart = Utils.getWeekRange(Utils.toISODate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())).start;
+
+      function renderWeek() {
+        const shifts = Store.loadShifts();
+        const week = Utils.getWeekRange(weekStart);
+        const startDate = new Date(week.start);
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(startDate);
+          d.setDate(d.getDate() + i);
+          days.push(Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate()));
+        }
+
+        const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        grid.innerHTML = '';
+
+        let totalHours = 0, totalSalary = 0, shiftCount = 0;
+
+        days.forEach((dateStr, idx) => {
+          const dayShifts = shifts.filter(s => s.date === dateStr).sort((a, b) => a.start.localeCompare(b.start));
+          const dayHours = dayShifts.reduce((sum, s) => sum + Utils.hoursBetween(s.start, s.end), 0);
+          const daySalary = dayShifts.reduce((sum, s) => sum + Utils.hoursBetween(s.start, s.end) * s.wage, 0);
+          totalHours += dayHours;
+          totalSalary += daySalary;
+          shiftCount += dayShifts.length;
+
+          const d = new Date(dateStr);
+          const isToday = dateStr === Utils.toISODate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+
+          const col = document.createElement('div');
+          col.className = 'card p-3 min-h-[160px] flex flex-col gap-2';
+          if (isToday) col.style.borderColor = 'var(--sakura-primary)';
+
+          col.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold" style="color: ${isToday ? 'var(--sakura-primary)' : 'var(--sakura-foreground)'}">${dayNames[d.getDay()]}</p>
+                <p class="text-xs" style="color: var(--sakura-muted-foreground)">${d.getMonth() + 1}/${d.getDate()}</p>
+              </div>
+              <span class="text-xs" style="color: var(--sakura-muted-foreground)">${dayHours.toFixed(1)}h</span>
+            </div>
+          `;
+
+          if (dayShifts.length === 0) {
+            col.innerHTML += '<p class="text-xs mt-1" style="color: var(--sakura-ink-3)">休息</p>';
+          } else {
+            dayShifts.forEach(s => {
+              const h = Utils.hoursBetween(s.start, s.end);
+              col.innerHTML += `
+                <div class="rounded-lg p-2 text-xs" style="background: rgba(244,111,174,.08)">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="font-medium" style="color: var(--sakura-primary)">${s.brand || s.type}</span>
+                    <span style="color: var(--sakura-muted-foreground)">${s.start}-${s.end}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span style="color: var(--sakura-ink-2)">${s.type} · ¥${s.wage}/h</span>
+                    <span class="font-medium" style="color: var(--sakura-primary)">${Utils.formatMoney(h * s.wage)}</span>
+                  </div>
+                  <div class="flex gap-1 mt-1">
+                    <button data-copy="${s.id}" class="text-[10px] px-1.5 py-0.5 rounded" style="background: var(--sakura-muted); color: var(--sakura-foreground)">复制</button>
+                    <button data-del="${s.id}" class="text-[10px] px-1.5 py-0.5 rounded" style="background: rgba(251,113,133,.15); color: var(--sakura-state-error)">删</button>
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          grid.appendChild(col);
+        });
+
+        document.getElementById('week-hours').textContent = totalHours.toFixed(1) + 'h';
+        document.getElementById('week-salary').textContent = Utils.formatMoney(totalSalary);
+        document.getElementById('week-count').textContent = shiftCount;
+        document.getElementById('week-rest').textContent = 7 - days.filter(d => shifts.some(s => s.date === d)).length;
+
+        const weekRange = Utils.getWeekRange(weekStart);
+        document.getElementById('week-label').textContent = weekRange.start + ' ~ ' + weekRange.end;
+      }
+
+      grid.addEventListener('click', function(e) {
+        const copyBtn = e.target.closest('[data-copy]');
+        const delBtn = e.target.closest('[data-del]');
+        if (copyBtn) {
+          const id = parseInt(copyBtn.dataset.copy);
+          const shifts = Store.loadShifts();
+          const s = shifts.find(x => x.id === id);
+          if (s) {
+            const nextDay = new Date(s.date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            shifts.push({
+              ...s,
+              id: Date.now(),
+              date: Utils.toISODate(nextDay.getFullYear(), nextDay.getMonth() + 1, nextDay.getDate())
+            });
+            Store.saveShifts(shifts);
+            renderWeek();
+            Utils.showToast('已复制到次日');
+          }
+        }
+        if (delBtn) {
+          if (!confirm('确定删除？')) return;
+          const id = parseInt(delBtn.dataset.del);
+          let shifts = Store.loadShifts();
+          shifts = shifts.filter(s => s.id !== id);
+          Store.saveShifts(shifts);
+          renderWeek();
+          Utils.showToast('已删除');
+        }
+      });
+
+      document.getElementById('prev-week').addEventListener('click', () => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() - 7);
+        weekStart = Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        renderWeek();
+      });
+      document.getElementById('next-week').addEventListener('click', () => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + 7);
+        weekStart = Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        renderWeek();
+      });
+      document.getElementById('this-week-btn').addEventListener('click', () => {
+        weekStart = Utils.getWeekRange(Utils.toISODate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())).start;
+        renderWeek();
+      });
+      document.getElementById('export-week').addEventListener('click', () => {
+        const week = Utils.getWeekRange(weekStart);
+        const shifts = Store.loadShifts().filter(s => s.date >= week.start && s.date <= week.end).sort((a, b) => a.date.localeCompare(b.date));
+        Utils.exportCSV('周排班_' + week.start + '.csv', shifts);
+      });
+
+      global.refreshApp = renderWeek;
+      renderWeek();
+    })();
+  </script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
