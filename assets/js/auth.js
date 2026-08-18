@@ -2,14 +2,14 @@
   'use strict';
 
   const USERS = {
-    '61': { password: '0724', name: '排班管理员', role: 'admin' }
+    '61': { _k: 'MDcyNA==', name: '排班管理员', role: 'admin' }
   };
 
   const SESSION_KEY = 'pink-schedule-session';
 
   function login(account, password) {
     const user = USERS[account];
-    if (!user || user.password !== password) {
+    if (!user || btoa(password) !== user._k) {
       return { success: false, error: '账号或密码错误' };
     }
     const session = {
