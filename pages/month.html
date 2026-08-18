@@ -2,7 +2,7 @@
 <html lang="zh-CN" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>月度排班 - 排班小助手</title>
   <meta name="theme-color" content="#F46FAE">
   <link rel="manifest" href="../manifest.json">
@@ -27,68 +27,39 @@
       --radius-md: var(--sakura-radius-md);
       --radius-lg: var(--sakura-radius-lg);
     }
-    @layer base {
-      body { background: var(--sakura-background); color: var(--sakura-foreground); }
-      td, th { @apply break-words; }
-      th { @apply whitespace-nowrap; }
-    }
-  </style>
-  <style>
-    .bg-background { background-color: var(--sakura-background); }
-    .text-foreground { color: var(--sakura-foreground); }
-    .bg-card { background-color: var(--sakura-card); }
-    .text-card-foreground { color: var(--sakura-card-foreground); }
-    .bg-primary { background-color: var(--sakura-primary); }
-    .text-primary { color: var(--sakura-primary); }
-    .text-primary-foreground { color: var(--sakura-primary-foreground); }
-    .bg-primary-foreground { background-color: var(--sakura-primary-foreground); }
-    .bg-muted { background-color: var(--sakura-muted); }
-    .text-muted-foreground { color: var(--sakura-muted-foreground); }
-    .border-border { border-color: var(--sakura-border); }
-    .border-input { border-color: var(--sakura-input); }
-    .ring-ring { --tw-ring-color: var(--sakura-ring); }
-    .hover\:bg-muted:hover { background-color: var(--sakura-muted); }
-    .hover\:bg-primary\/10:hover { background-color: rgba(244,111,174,.1); }
-    .bg-primary\/5 { background-color: rgba(244,111,174,.05); }
-    .bg-primary\/10 { background-color: rgba(244,111,174,.1); }
-    .bg-primary\/20 { background-color: rgba(244,111,174,.2); }
-    .bg-muted\/30 { background-color: rgba(252,231,238,.3); }
-    .border-primary\/30 { border-color: rgba(244,111,174,.3); }
-    .text-primary\/80 { color: rgba(244,111,174,.8); }
-    .focus\:ring-2:focus { box-shadow: 0 0 0 2px var(--sakura-ring); }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
   <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
-    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-3">
+    <div class="w-full max-w-[1280px] mx-auto px-3 md:px-6 h-14 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
           <i data-lucide="calendar-heart" class="w-4 h-4"></i>
         </div>
-        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="font-semibold text-sm nav-brand-text" style="color: var(--sakura-foreground)">排班小助手</span>
         <span class="badge badge-primary ml-1" id="user-badge"></span>
       </div>
-      <div class="flex items-center gap-1">
-        <a href="month.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">月视图</a>
-        <a href="week.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">周视图</a>
-        <a href="dashboard.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">统计</a>
-        <a href="settings.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">设置</a>
-        <button id="theme-toggle" class="btn-ghost p-2 rounded-md">
+      <div class="flex items-center gap-1 nav-scroll">
+        <a href="month.html" class="nav-link active px-2.5 py-1.5 text-sm font-medium rounded-md whitespace-nowrap">月视图</a>
+        <a href="week.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">周视图</a>
+        <a href="dashboard.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">统计</a>
+        <a href="settings.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md shrink-0">
           <i data-lucide="moon" class="w-4 h-4"></i>
         </button>
-        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5">
+        <button id="ai-toggle" class="btn-primary px-2.5 py-1.5 rounded-md text-sm font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
           <i data-lucide="sparkles" class="w-4 h-4"></i>AI
         </button>
-        <button id="logout-btn" class="btn-ghost p-2 rounded-md" title="退出登录">
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md shrink-0" title="退出登录">
           <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
   </nav>
 
-  <main class="w-full max-w-[1280px] mx-auto px-4 md:px-6 py-6">
-    <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-      <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+  <main class="w-full max-w-[1280px] mx-auto px-3 md:px-6 py-4 md:py-6">
+    <div class="flex items-center justify-between mb-4 gap-2 flex-wrap">
+      <div class="flex items-center gap-2 flex-1 min-w-[180px]">
         <div class="relative flex-1 max-w-xs">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--sakura-ink-3)"></i>
           <input id="search-input" type="text" placeholder="搜索品牌或班次..." class="input-field pl-10" style="height: 36px">
@@ -101,12 +72,12 @@
           <option value="加班">加班</option>
         </select>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 md:gap-2">
         <button id="prev-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
         <select id="year-select" class="input-field" style="height: 36px; width: auto"></select>
         <select id="month-select" class="input-field" style="height: 36px; width: auto"></select>
         <button id="next-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-        <button id="today-btn" class="btn-ghost px-3 py-1.5 rounded-md text-sm">今天</button>
+        <button id="today-btn" class="btn-ghost px-3 py-1.5 rounded-md text-sm whitespace-nowrap">今天</button>
       </div>
     </div>
 
@@ -115,16 +86,16 @@
       <span id="conflict-text" class="text-sm" style="color: var(--sakura-state-error)"></span>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <section class="lg:col-span-2 card p-5">
-        <div class="grid grid-cols-7 gap-1 text-center text-xs mb-2" style="color: var(--sakura-muted-foreground)">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <section class="lg:col-span-2 card p-3 md:p-5">
+        <div class="cal-header">
           <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
         </div>
-        <div class="grid grid-cols-7 gap-1" id="calendar-grid"></div>
+        <div class="cal-grid" id="calendar-grid"></div>
       </section>
 
       <aside class="space-y-4">
-        <section class="card p-5">
+        <section class="card p-4 md:p-5">
           <h2 class="text-base font-semibold mb-4 flex items-center gap-2">
             <i data-lucide="wallet" class="w-5 h-5" style="color: var(--sakura-primary)"></i>工资概览
           </h2>
@@ -165,7 +136,7 @@
           </div>
         </section>
 
-        <section class="card p-5">
+        <section class="card p-4 md:p-5">
           <h2 class="text-base font-semibold mb-4 flex items-center gap-2">
             <i data-lucide="plus-circle" class="w-5 h-5" style="color: var(--sakura-primary)"></i>添加班次
           </h2>
@@ -213,11 +184,11 @@
           </form>
         </section>
 
-        <section class="card p-5">
+        <section class="card p-4 md:p-5">
           <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
             <i data-lucide="bookmark" class="w-5 h-5" style="color: var(--sakura-primary)"></i>班次模板
           </h2>
-          <div id="template-list" class="space-y-2 max-h-40 overflow-y-auto no-scrollbar"></div>
+          <div id="template-list" class="space-y-2 no-scrollbar" style="max-height: 160px; overflow-y: auto"></div>
         </section>
       </aside>
     </div>
@@ -290,9 +261,7 @@
 
         for (let i = 0; i < startWeekday; i++) {
           const cell = document.createElement('div');
-          cell.className = 'min-h-20 rounded-lg';
-          cell.style.background = 'var(--sakura-muted)';
-          cell.style.opacity = '0.3';
+          cell.className = 'cal-cell-empty';
           calendarGrid.appendChild(cell);
         }
 
@@ -301,21 +270,21 @@
           const dayShifts = shifts.filter(s => s.date === dateStr);
           const isToday = dateStr === Utils.toISODate(today.getFullYear(), today.getMonth() + 1, today.getDate());
           const cell = document.createElement('div');
-          cell.className = 'min-h-20 rounded-lg border p-1.5 flex flex-col gap-1 cursor-pointer transition-shadow hover:shadow-md';
-          cell.style.borderColor = isToday ? 'var(--sakura-primary)' : 'var(--sakura-border)';
-          cell.style.background = isToday ? 'rgba(244,111,174,.05)' : 'var(--sakura-background)';
+          cell.className = 'cal-cell';
+          if (isToday) {
+            cell.style.borderColor = 'var(--sakura-primary)';
+            cell.style.background = 'rgba(244,111,174,.05)';
+          }
 
           const num = document.createElement('span');
-          num.className = 'text-xs font-medium';
+          num.className = 'cal-day-num';
           num.style.color = isToday ? 'var(--sakura-primary)' : 'var(--sakura-foreground)';
           num.textContent = d;
           cell.appendChild(num);
 
           dayShifts.forEach(s => {
             const chip = document.createElement('span');
-            chip.className = 'text-[10px] leading-tight px-1 py-0.5 rounded truncate';
-            chip.style.background = 'rgba(244,111,174,.1)';
-            chip.style.color = 'var(--sakura-primary)';
+            chip.className = 'cal-chip';
             chip.textContent = (s.brand || s.type);
             chip.title = (s.brand ? s.brand + ' ' : '') + s.type + ' ' + s.start + '-' + s.end + ' ¥' + s.wage + '/h';
             cell.appendChild(chip);
@@ -358,15 +327,19 @@
       }
 
       function checkConflicts() {
-        const shifts = Store.loadShifts();
-        const conflicts = AI.detectConflicts(shifts);
-        const alert = document.getElementById('conflict-alert');
-        const text = document.getElementById('conflict-text');
-        if (conflicts.length > 0) {
-          alert.classList.remove('hidden');
-          text.textContent = '发现 ' + conflicts.length + ' 个时间冲突: ' + conflicts[0].message;
-        } else {
-          alert.classList.add('hidden');
+        try {
+          const shifts = Store.loadShifts();
+          const conflicts = AI.detectConflicts(shifts);
+          const alert = document.getElementById('conflict-alert');
+          const text = document.getElementById('conflict-text');
+          if (conflicts.length > 0) {
+            alert.classList.remove('hidden');
+            text.textContent = '发现 ' + conflicts.length + ' 个时间冲突: ' + conflicts[0].message;
+          } else {
+            alert.classList.add('hidden');
+          }
+        } catch(e) {
+          console.warn('Conflict check skipped:', e);
         }
       }
 
@@ -374,17 +347,6 @@
         const shifts = Store.loadShifts();
         const brands = Array.from(new Set(shifts.map(s => s.brand).filter(Boolean))).sort();
         document.getElementById('brand-suggestions').innerHTML = brands.map(b => '<option value="' + b + '">').join('');
-      }
-
-      function deleteShift(id) {
-        if (!confirm('确定删除这条排班？')) return;
-        let shifts = Store.loadShifts();
-        shifts = shifts.filter(s => s.id !== id);
-        Store.saveShifts(shifts);
-        renderMonth();
-        renderSummary();
-        renderTemplates();
-        Utils.showToast('已删除');
       }
 
       function renderTemplates() {

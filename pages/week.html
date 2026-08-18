@@ -45,22 +45,22 @@
 </head>
 <body class="min-h-screen font-sans antialiased">
   <nav class="sticky top-0 z-40 backdrop-blur-md border-b" style="background: rgba(255,246,248,.85); border-color: var(--sakura-border)">
-    <div class="w-full max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-3">
+    <div class="w-full max-w-[1280px] mx-auto px-3 md:px-6 h-14 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--sakura-primary); color: var(--sakura-primary-foreground)">
           <i data-lucide="calendar-heart" class="w-4 h-4"></i>
         </div>
-        <span class="font-semibold text-sm" style="color: var(--sakura-foreground)">排班小助手</span>
+        <span class="font-semibold text-sm nav-brand-text" style="color: var(--sakura-foreground)">排班小助手</span>
         <span class="badge badge-primary ml-1" id="user-badge"></span>
       </div>
-      <div class="flex items-center gap-1">
-        <a href="month.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">月视图</a>
-        <a href="week.html" class="nav-link active px-3 py-1.5 text-sm font-medium rounded-md">周视图</a>
-        <a href="dashboard.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">统计</a>
-        <a href="settings.html" class="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground">设置</a>
-        <button id="theme-toggle" class="btn-ghost p-2 rounded-md"><i data-lucide="moon" class="w-4 h-4"></i></button>
-        <button id="ai-toggle" class="btn-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4"></i>AI</button>
-        <button id="logout-btn" class="btn-ghost p-2 rounded-md"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      <div class="flex items-center gap-1 nav-scroll">
+        <a href="month.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">月视图</a>
+        <a href="week.html" class="nav-link active px-2.5 py-1.5 text-sm font-medium rounded-md whitespace-nowrap">周视图</a>
+        <a href="dashboard.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">统计</a>
+        <a href="settings.html" class="nav-link px-2.5 py-1.5 text-sm font-medium rounded-md text-muted-foreground whitespace-nowrap">设置</a>
+        <button id="theme-toggle" class="btn-ghost p-2 rounded-md shrink-0"><i data-lucide="moon" class="w-4 h-4"></i></button>
+        <button id="ai-toggle" class="btn-primary px-2.5 py-1.5 rounded-md text-sm font-medium flex items-center gap-1 shrink-0 whitespace-nowrap"><i data-lucide="sparkles" class="w-4 h-4"></i>AI</button>
+        <button id="logout-btn" class="btn-ghost p-2 rounded-md shrink-0"><i data-lucide="log-out" class="w-4 h-4"></i></button>
       </div>
     </div>
   </nav>
