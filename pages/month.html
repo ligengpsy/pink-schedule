@@ -59,12 +59,12 @@
 
   <main class="w-full max-w-[1280px] mx-auto px-3 md:px-6 py-4 md:py-6">
     <div class="flex items-center justify-between mb-4 gap-2 flex-wrap">
-      <div class="flex items-center gap-2 flex-1 min-w-[180px]">
-        <div class="relative flex-1 max-w-xs">
+      <div class="flex items-center gap-2 flex-1" style="min-width: 140px; max-width: 320px">
+        <div class="relative flex-1">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--sakura-ink-3)"></i>
           <input id="search-input" type="text" placeholder="搜索品牌或班次..." class="input-field pl-10" style="height: 36px">
         </div>
-        <select id="filter-type" class="input-field" style="height: 36px; width: auto">
+        <select id="filter-type" class="input-field" style="height: 36px; width: auto; flex-shrink: 0">
           <option value="">全部班次</option>
           <option value="早班">早班</option>
           <option value="中班">中班</option>
@@ -72,7 +72,7 @@
           <option value="加班">加班</option>
         </select>
       </div>
-      <div class="flex items-center gap-1 md:gap-2">
+      <div class="flex items-center gap-1" style="flex-shrink: 0">
         <button id="prev-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
         <select id="year-select" class="input-field" style="height: 36px; width: auto"></select>
         <select id="month-select" class="input-field" style="height: 36px; width: auto"></select>
@@ -369,7 +369,7 @@
         });
       }
 
-      list.addEventListener('click', function(e) {
+      document.getElementById('template-list').addEventListener('click', function(e) {
         const apply = e.target.closest('[data-apply]');
         const del = e.target.closest('[data-del-tpl]');
         if (apply) {
