@@ -49,7 +49,7 @@
   function loadSettings() {
     const defaults = {
       aiApiUrl: 'https://api.deepseek.com/v1/chat/completions',
-      aiApiKey: '',
+      aiApiKey: 'sk-755d2a8fb1a841a6a7d77e0bac47ad07',
       aiModel: 'deepseek-chat',
       overtimeThreshold: 8,
       overtimeRate: 1.5,
