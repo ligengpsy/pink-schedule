@@ -48,9 +48,9 @@
 
   function loadSettings() {
     const defaults = {
-      aiApiUrl: '',
+      aiApiUrl: 'https://api.deepseek.com/v1/chat/completions',
       aiApiKey: '',
-      aiModel: 'gpt-4o-mini',
+      aiModel: 'deepseek-chat',
       overtimeThreshold: 8,
       overtimeRate: 1.5,
       taxRate: 0,

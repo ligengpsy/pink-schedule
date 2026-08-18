@@ -70,19 +70,24 @@
       <h2 class="text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--sakura-foreground)">
         <i data-lucide="sparkles" class="w-5 h-5" style="color: var(--sakura-primary)"></i>AI 配置
       </h2>
-      <p class="text-xs mb-4" style="color: var(--sakura-muted-foreground)">配置 AI API 后，AI助手可提供智能排班建议、工资分析、冲突检测等功能。兼容 OpenAI 格式的 API 均可使用。</p>
+      <p class="text-xs mb-4" style="color: var(--sakura-muted-foreground)">配置 AI API 后，AI助手可提供智能排班建议、工资分析、冲突检测等功能。推荐使用 DeepSeek（便宜、中文好）。</p>
+      <div class="mb-3 flex gap-2 flex-wrap">
+        <button type="button" id="preset-deepseek" class="text-xs px-2.5 py-1 rounded-full" style="background: rgba(244,111,174,.1); color: var(--sakura-primary); border: 1px solid var(--sakura-border)">DeepSeek</button>
+        <button type="button" id="preset-openai" class="text-xs px-2.5 py-1 rounded-full" style="background: var(--sakura-muted); color: var(--sakura-muted-foreground); border: 1px solid var(--sakura-border)">OpenAI</button>
+        <button type="button" id="preset-qwen" class="text-xs px-2.5 py-1 rounded-full" style="background: var(--sakura-muted); color: var(--sakura-muted-foreground); border: 1px solid var(--sakura-border)">通义千问</button>
+      </div>
       <form id="ai-form" class="space-y-4">
         <div>
           <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">API 地址</label>
-          <input type="text" name="aiApiUrl" placeholder="https://api.openai.com/v1/chat/completions" class="input-field">
+          <input type="text" name="aiApiUrl" placeholder="https://api.deepseek.com/v1/chat/completions" class="input-field">
         </div>
         <div>
           <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">API 密钥</label>
-          <input type="password" name="aiApiKey" placeholder="sk-..." class="input-field">
+          <input type="password" name="aiApiKey" placeholder="在 platform.deepseek.com 获取" class="input-field">
         </div>
         <div>
           <label class="block text-xs font-medium mb-1" style="color: var(--sakura-muted-foreground)">模型</label>
-          <input type="text" name="aiModel" placeholder="gpt-4o-mini" class="input-field">
+          <input type="text" name="aiModel" placeholder="deepseek-chat" class="input-field">
         </div>
         <button type="submit" class="btn-primary w-full font-medium" style="height: 40px">保存AI配置</button>
       </form>
@@ -176,6 +181,30 @@
       Store.saveSettings(s);
       Utils.showToast('AI配置已保存');
     });
+
+    const PRESETS = {
+      deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', model: 'deepseek-chat', keyHint: '在 platform.deepseek.com 获取' },
+      openai: { url: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', keyHint: '在 platform.openai.com 获取' },
+      qwen: { url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', model: 'qwen-turbo', keyHint: '在 dashscope.aliyun.com 获取' }
+    };
+    function applyPreset(name) {
+      const p = PRESETS[name];
+      if (!p) return;
+      aiForm.querySelector('[name="aiApiUrl"]').value = p.url;
+      aiForm.querySelector('[name="aiModel"]').value = p.model;
+      aiForm.querySelector('[name="aiApiKey"]').placeholder = p.keyHint;
+      Object.values(PRESETS).forEach(() => {});
+      document.querySelectorAll('[id^="preset-"]').forEach(btn => {
+        btn.style.background = 'var(--sakura-muted)';
+        btn.style.color = 'var(--sakura-muted-foreground)';
+      });
+      const activeBtn = document.getElementById('preset-' + name);
+      activeBtn.style.background = 'rgba(244,111,174,.1)';
+      activeBtn.style.color = 'var(--sakura-primary)';
+    }
+    document.getElementById('preset-deepseek').addEventListener('click', () => applyPreset('deepseek'));
+    document.getElementById('preset-openai').addEventListener('click', () => applyPreset('openai'));
+    document.getElementById('preset-qwen').addEventListener('click', () => applyPreset('qwen'));
 
     const rulesForm = document.getElementById('rules-form');
     rulesForm.querySelector('[name="overtimeThreshold"]').value = settings.overtimeThreshold;
