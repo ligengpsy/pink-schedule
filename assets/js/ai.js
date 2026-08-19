@@ -5,6 +5,83 @@
     return Store.loadSettings();
   }
 
+  function buildSystemPrompt(context) {
+    let prompt = '你是一个智能排班助手，帮助用户管理排班、计算工资、分析工作情况。\n';
+    prompt += '用户使用中文交流，请用中文简洁地回答。\n\n';
+
+    prompt += '## 你的能力\n';
+    prompt += '1. 理解用户自然语言，解析班次信息（日期、时间、品牌、时薪等）\n';
+    prompt += '2. 计算和分析工资、工时\n';
+    prompt += '3. 检测排班冲突\n';
+    prompt += '4. 给出排班优化建议\n\n';
+
+    prompt += '## 班次解析规则\n';
+    prompt += '- 日期："今天"=当天，"明天"=次日，"后天"=第三日，"X号"/"X日"=具体日期\n';
+    prompt += '- 时间："6-10点"=6:00到10:00，"下午2点到6点"=14:00到18:00\n';
+    prompt += '- 班次类型：早上/上午→早班，下午→中班，晚上→晚班\n';
+    prompt += '- 时薪："每小时200"/"时薪200"/"200块一小时"→时薪200\n\n';
+
+    prompt += '## 回复格式\n';
+    prompt += '当用户描述的班次信息可以解析时：\n';
+    prompt += '1. 先用自然语言简短确认（如"好的，帮你记一下：8月19日 珀莱雅 早班 6:00-10:00 时薪¥200，预计收入¥800"）\n';
+    prompt += '2. 然后在末尾加一行结构化数据，用<shift>标签包裹JSON：\n';
+    prompt += '<shift>{"date":"YYYY-MM-DD","type":"早班|中班|晚班|加班|自定义","brand":"品牌名","start":"HH:MM","end":"HH:MM","wage":数字}</shift>\n\n';
+    prompt += '当用户问工资、建议等问题时，正常回复即可，不要加<shift>标签。\n\n';
+
+    if (context && context.shifts && context.shifts.length > 0) {
+      const now = new Date();
+      const monthPrefix = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const monthShifts = context.shifts.filter(s => s.date.startsWith(monthPrefix));
+      let totalHours = 0;
+      let totalSalary = 0;
+      monthShifts.forEach(s => {
+        const h = Utils.hoursBetween(s.start, s.end);
+        totalHours += h;
+        totalSalary += h * s.wage;
+      });
+
+      prompt += '## 当前用户本月数据\n';
+      prompt += '- 今天: ' + now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '\n';
+      prompt += '- 本月班次数: ' + monthShifts.length + '\n';
+      prompt += '- 本月总工时: ' + totalHours.toFixed(1) + '小时\n';
+      prompt += '- 本月预估工资: ¥' + totalSalary.toFixed(2) + '\n';
+
+      if (monthShifts.length > 0) {
+        const brands = {};
+        monthShifts.forEach(s => {
+          const b = s.brand || '未填写';
+          if (!brands[b]) brands[b] = { hours: 0, salary: 0 };
+          const h = Utils.hoursBetween(s.start, s.end);
+          brands[b].hours += h;
+          brands[b].salary += h * s.wage;
+        });
+        prompt += '- 品牌分布: ' + Object.keys(brands).map(b => b + '(' + brands[b].hours.toFixed(0) + 'h)').join(', ') + '\n';
+      }
+
+      prompt += '\n## 本月班次详情\n';
+      monthShifts.sort((a, b) => a.date.localeCompare(b.date)).forEach(s => {
+        const h = Utils.hoursBetween(s.start, s.end);
+        prompt += s.date + ' ' + (s.brand || '') + ' ' + s.type + ' ' + s.start + '-' + s.end + ' ¥' + s.wage + '/h (' + h.toFixed(1) + 'h)\n';
+      });
+    }
+
+    return prompt;
+  }
+
+  function extractShiftData(reply) {
+    const match = reply.match(/<shift>\s*(\{[^}]+\})\s*<\/shift>/);
+    if (!match) return null;
+    try {
+      const data = JSON.parse(match[1]);
+      if (data.date && data.start) return data;
+    } catch (e) {}
+    return null;
+  }
+
+  function cleanReply(reply) {
+    return reply.replace(/<shift>\s*\{[^}]+\}\s*<\/shift>/g, '').trim();
+  }
+
   async function chat(userMessage, context) {
     const settings = getSettings();
 
@@ -18,13 +95,13 @@
 
     const systemPrompt = buildSystemPrompt(context);
     const body = {
-      model: settings.aiModel || 'gpt-4o-mini',
+      model: settings.aiModel || 'deepseek-chat',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage }
       ],
-      temperature: 0.7,
-      max_tokens: 800
+      temperature: 0.3,
+      max_tokens: 1000
     };
 
     try {
@@ -43,46 +120,18 @@
       }
 
       const data = await res.json();
-      const reply = data.choices?.[0]?.message?.content || data.content || '未获取到回复';
-      return { success: true, reply: reply };
+      const rawReply = data.choices?.[0]?.message?.content || data.content || '未获取到回复';
+      const shiftData = extractShiftData(rawReply);
+      const cleanText = cleanReply(rawReply);
+
+      return {
+        success: true,
+        reply: cleanText,
+        shift: shiftData
+      };
     } catch (e) {
       return { success: false, error: '网络请求失败: ' + e.message };
     }
-  }
-
-  function buildSystemPrompt(context) {
-    let prompt = '你是一个排班助手AI，帮助用户管理排班、计算工资、分析工作情况。';
-    prompt += '用户使用中文交流。请简洁地回答问题。';
-
-    if (context && context.shifts && context.shifts.length > 0) {
-      const now = new Date();
-      const monthPrefix = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-      const monthShifts = context.shifts.filter(s => s.date.startsWith(monthPrefix));
-      let totalHours = 0;
-      let totalSalary = 0;
-      monthShifts.forEach(s => {
-        const h = Utils.hoursBetween(s.start, s.end);
-        totalHours += h;
-        totalSalary += h * s.wage;
-      });
-      prompt += '\n\n当前用户本月排班数据：';
-      prompt += '\n- 本月班次数: ' + monthShifts.length;
-      prompt += '\n- 本月总工时: ' + totalHours.toFixed(1) + '小时';
-      prompt += '\n- 本月预估工资: ¥' + totalSalary.toFixed(2);
-      if (monthShifts.length > 0) {
-        const brands = {};
-        monthShifts.forEach(s => {
-          const b = s.brand || '未填写';
-          if (!brands[b]) brands[b] = { hours: 0, salary: 0 };
-          const h = Utils.hoursBetween(s.start, s.end);
-          brands[b].hours += h;
-          brands[b].salary += h * s.wage;
-        });
-        prompt += '\n- 品牌分布: ' + Object.keys(brands).map(b => b + '(' + brands[b].hours.toFixed(0) + 'h)').join(', ');
-      }
-    }
-
-    return prompt;
   }
 
   function localAnalyze(message, context) {
@@ -112,19 +161,6 @@
     const t = text.replace(/，/g, ' ').replace(/\./g, ':');
     const now = new Date();
 
-    // 1. Parse shift type
-    const typeMatch = t.match(/(早班|中班|晚班|加班|自定义)/);
-    if (typeMatch) {
-      result.type = typeMatch[1];
-    } else if (/早上|上午|清晨|凌晨/.test(t)) {
-      result.type = '早班';
-    } else if (/下午/.test(t)) {
-      result.type = '中班';
-    } else if (/晚上|晚间|夜间/.test(t)) {
-      result.type = '晚班';
-    }
-
-    // 2. Parse date - support 今天/明天/后天 and X号/X日
     if (/今天|今日/.test(t)) {
       result.date = Utils.toISODate(now.getFullYear(), now.getMonth() + 1, now.getDate());
     } else if (/明天|明日/.test(t)) {
@@ -153,10 +189,13 @@
       }
     }
 
-    // 3. Parse time - support "6-10点", "6点-10点", "6:00-10:00", "6点到10点"
-    const times = [];
+    if (/早上|上午|清晨|凌晨/.test(t)) result.type = '早班';
+    else if (/下午/.test(t)) result.type = '中班';
+    else if (/晚上|晚间|夜间/.test(t)) result.type = '晚班';
+    const typeMatch = t.match(/(早班|中班|晚班|加班|自定义)/);
+    if (typeMatch) result.type = typeMatch[1];
 
-    // Try range format first: X-Y点, X点-Y点, X到Y点, X至Y
+    const times = [];
     const rangeMatch = t.match(/(\d{1,2})(?:\s*[:点](\d{1,2}|半)?)?\s*[-到至]\s*(\d{1,2})(?:\s*[:点](\d{1,2}|半)?)?/);
     if (rangeMatch) {
       const beforeText = t.substring(0, t.indexOf(rangeMatch[0]));
@@ -167,8 +206,6 @@
       else if (rangeMatch[2]) min1 = parseInt(rangeMatch[2], 10);
       if (rangeMatch[4] === '半') min2 = 30;
       else if (rangeMatch[4]) min2 = parseInt(rangeMatch[4], 10);
-
-      // Adjust for afternoon/evening
       if (/下午|晚上|晚间/.test(beforeText)) {
         if (h1 < 12) h1 += 12;
         if (h2 < 12) h2 += 12;
@@ -177,7 +214,6 @@
       times.push(String(h2).padStart(2, '0') + ':' + String(min2).padStart(2, '0'));
     }
 
-    // If no range found, try individual times
     if (!times.length) {
       const timeRegex = /(早上|上午|中午|下午|晚上|凌晨)?\s*(\d{1,2})[:点](\d{1,2}|半)?/g;
       let mch;
@@ -197,7 +233,6 @@
     if (times.length >= 1) result.start = times[0];
     if (times.length >= 2) result.end = times[1];
 
-    // 4. Parse brand - remove known info, what remains is likely the brand
     let remaining = t;
     remaining = remaining.replace(/今天|今日|明天|明日|后天|大后天|下周|这周|本周|下个?月|这个?月|明年/g, ' ');
     remaining = remaining.replace(/早上|上午|中午|下午|晚上|凌晨|清晨|夜间|晚间/g, ' ');
@@ -215,7 +250,6 @@
       if (words.length > 0) result.brand = words[0];
     }
 
-    // 5. Parse wage
     const wageMatch = t.match(/时薪?[\s为是]?(\d+)/) ||
                       t.match(/(?:每|一?小时)\s*(\d+)/) ||
                       t.match(/(\d+)(?:块|元)(?:一?小时|每小时|时薪)/) ||
