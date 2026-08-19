@@ -28,6 +28,18 @@
     prompt += '<shift>{"date":"YYYY-MM-DD","type":"早班|中班|晚班|加班|自定义","brand":"品牌名","start":"HH:MM","end":"HH:MM","wage":数字}</shift>\n\n';
     prompt += '当用户问工资、建议等问题时，正常回复即可，不要加<shift>标签。\n\n';
 
+    // Always include current date - critical for parsing
+    {
+      var now = new Date();
+      var todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      prompt += '## 当前日期（极其重要）\n';
+      prompt += '今天是' + now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日，日期格式为' + todayStr + '。\n';
+      prompt += '用户说"今天"时，date字段必须为' + todayStr + '。\n';
+      var tomorrow = new Date(now.getTime() + 86400000);
+      var tomorrowStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
+      prompt += '用户说"明天"时，date字段必须为' + tomorrowStr + '。\n\n';
+    }
+
     if (context && context.shifts && context.shifts.length > 0) {
       const now = new Date();
       const monthPrefix = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
@@ -41,7 +53,6 @@
       });
 
       prompt += '## 当前用户本月数据\n';
-      prompt += '- 今天: ' + now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '\n';
       prompt += '- 本月班次数: ' + monthShifts.length + '\n';
       prompt += '- 本月总工时: ' + totalHours.toFixed(1) + '小时\n';
       prompt += '- 本月预估工资: ¥' + totalSalary.toFixed(2) + '\n';

@@ -477,7 +477,7 @@
       searchInput.addEventListener('input', Utils.debounce(() => { renderMonth(); renderSummary(); }));
       filterType.addEventListener('change', () => { renderMonth(); renderSummary(); });
 
-      global.refreshApp = function() { renderMonth(); renderSummary(); renderTemplates(); };
+      window.refreshApp = function() { renderMonth(); renderSummary(); renderTemplates(); };
 
       initSelectors();
       updateSelectors();

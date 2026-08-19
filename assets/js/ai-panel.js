@@ -96,9 +96,23 @@
     if (el) el.remove();
   }
 
-  function showAddShiftButton(shiftData) {
+  function showAddShiftButton(shiftData, userMessage) {
     const messages = document.getElementById('ai-messages');
     if (!messages || !shiftData) return;
+
+    // Date correction: if user said 今天/明天/后天, override AI's date
+    if (userMessage) {
+      var now = new Date();
+      if (/今天|今日/.test(userMessage)) {
+        shiftData.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      } else if (/明天|明日/.test(userMessage)) {
+        var d = new Date(now.getTime() + 86400000);
+        shiftData.date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      } else if (/后天/.test(userMessage)) {
+        var d = new Date(now.getTime() + 86400000 * 2);
+        shiftData.date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+    }
 
     const hours = Utils.hoursBetween(shiftData.start, shiftData.end || '18:00');
     const earn = hours * (shiftData.wage || 0);
@@ -166,13 +180,13 @@
       if (result.success) {
         addBotMessage(result.reply);
         if (result.shift) {
-          showAddShiftButton(result.shift);
+          showAddShiftButton(result.shift, text);
         }
       } else if (result.fallback) {
         addBotMessage(result.fallback);
         const parsed = AI.parseScheduleText(text);
         if (parsed.date && parsed.start) {
-          showAddShiftButton(parsed);
+          showAddShiftButton(parsed, text);
         }
       } else {
         addBotMessage('出错了: ' + (result.error || '未知错误'));
