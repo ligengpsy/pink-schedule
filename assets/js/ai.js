@@ -110,48 +110,116 @@
   function parseScheduleText(text) {
     const result = { date: '', type: '', brand: '', start: '', end: '', wage: 0 };
     const t = text.replace(/，/g, ' ').replace(/\./g, ':');
-
-    const typeMatch = t.match(/(早班|中班|晚班|加班|自定义)/);
-    if (typeMatch) result.type = typeMatch[1];
-
     const now = new Date();
-    const dateMatch = t.match(/(?:(明年|下个?月|这个?月)\s*)?(?:(\d{1,2})月)?(\d{1,2})(?:[号日])/);
-    if (dateMatch) {
-      let y = now.getFullYear();
-      let m = now.getMonth() + 1;
-      const relative = dateMatch[1] || '';
-      const monthPart = dateMatch[2];
-      const dayPart = parseInt(dateMatch[3], 10);
-      if (relative.includes('明年')) y = now.getFullYear() + 1;
-      if (relative.includes('下个月')) m = now.getMonth() + 2;
-      else if (relative.includes('这个月')) m = now.getMonth() + 1;
-      else if (monthPart) m = parseInt(monthPart, 10);
-      if (m > 12) { m -= 12; y += 1; }
-      result.date = y + '-' + String(m).padStart(2, '0') + '-' + String(dayPart).padStart(2, '0');
+
+    // 1. Parse shift type
+    const typeMatch = t.match(/(早班|中班|晚班|加班|自定义)/);
+    if (typeMatch) {
+      result.type = typeMatch[1];
+    } else if (/早上|上午|清晨|凌晨/.test(t)) {
+      result.type = '早班';
+    } else if (/下午/.test(t)) {
+      result.type = '中班';
+    } else if (/晚上|晚间|夜间/.test(t)) {
+      result.type = '晚班';
     }
 
-    const brandPattern = /(?:\d{1,2}月)?\d{1,2}[号日]\s*([^早中晚加自\d\s：:,，]{2,}?)\s*(?:早班|中班|晚班|加班|自定义)/;
-    const brandMatch = t.match(brandPattern);
-    if (brandMatch) result.brand = brandMatch[1].trim();
+    // 2. Parse date - support 今天/明天/后天 and X号/X日
+    if (/今天|今日/.test(t)) {
+      result.date = Utils.toISODate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    } else if (/明天|明日/.test(t)) {
+      const d = new Date(now.getTime() + 86400000);
+      result.date = Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    } else if (/后天/.test(t)) {
+      const d = new Date(now.getTime() + 86400000 * 2);
+      result.date = Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    } else if (/大后天/.test(t)) {
+      const d = new Date(now.getTime() + 86400000 * 3);
+      result.date = Utils.toISODate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    } else {
+      const dateMatch = t.match(/(?:(明年|下个?月|这个?月)\s*)?(?:(\d{1,2})月)?(\d{1,2})(?:[号日])/);
+      if (dateMatch) {
+        let y = now.getFullYear();
+        let m = now.getMonth() + 1;
+        const relative = dateMatch[1] || '';
+        const monthPart = dateMatch[2];
+        const dayPart = parseInt(dateMatch[3], 10);
+        if (relative.includes('明年')) y = now.getFullYear() + 1;
+        if (relative.includes('下')) m = now.getMonth() + 2;
+        else if (relative.includes('这')) m = now.getMonth() + 1;
+        else if (monthPart) m = parseInt(monthPart, 10);
+        if (m > 12) { m -= 12; y += 1; }
+        result.date = y + '-' + String(m).padStart(2, '0') + '-' + String(dayPart).padStart(2, '0');
+      }
+    }
 
-    const timeRegex = /(早上|上午|中午|下午|晚上|凌晨)?\s*(\d{1,2})[:点](\d{1,2}|半)?/g;
+    // 3. Parse time - support "6-10点", "6点-10点", "6:00-10:00", "6点到10点"
     const times = [];
-    let mch;
-    while ((mch = timeRegex.exec(t)) !== null) {
-      let mer = mch[1] || '';
-      let h = parseInt(mch[2], 10);
-      let min = mch[3];
-      let minNum = 0;
-      if (min === '半') minNum = 30;
-      else if (min) minNum = parseInt(min, 10);
-      if ((mer === '下午' || mer === '晚上') && h < 12) h += 12;
-      if (mer === '中午' && h < 12) h += 12;
-      times.push(String(h).padStart(2, '0') + ':' + String(minNum).padStart(2, '0'));
+
+    // Try range format first: X-Y点, X点-Y点, X到Y点, X至Y
+    const rangeMatch = t.match(/(\d{1,2})(?:\s*[:点](\d{1,2}|半)?)?\s*[-到至]\s*(\d{1,2})(?:\s*[:点](\d{1,2}|半)?)?/);
+    if (rangeMatch) {
+      const beforeText = t.substring(0, t.indexOf(rangeMatch[0]));
+      let h1 = parseInt(rangeMatch[1], 10);
+      let h2 = parseInt(rangeMatch[3], 10);
+      let min1 = 0, min2 = 0;
+      if (rangeMatch[2] === '半') min1 = 30;
+      else if (rangeMatch[2]) min1 = parseInt(rangeMatch[2], 10);
+      if (rangeMatch[4] === '半') min2 = 30;
+      else if (rangeMatch[4]) min2 = parseInt(rangeMatch[4], 10);
+
+      // Adjust for afternoon/evening
+      if (/下午|晚上|晚间/.test(beforeText)) {
+        if (h1 < 12) h1 += 12;
+        if (h2 < 12) h2 += 12;
+      }
+      times.push(String(h1).padStart(2, '0') + ':' + String(min1).padStart(2, '0'));
+      times.push(String(h2).padStart(2, '0') + ':' + String(min2).padStart(2, '0'));
     }
+
+    // If no range found, try individual times
+    if (!times.length) {
+      const timeRegex = /(早上|上午|中午|下午|晚上|凌晨)?\s*(\d{1,2})[:点](\d{1,2}|半)?/g;
+      let mch;
+      while ((mch = timeRegex.exec(t)) !== null) {
+        let mer = mch[1] || '';
+        let h = parseInt(mch[2], 10);
+        let min = mch[3];
+        let minNum = 0;
+        if (min === '半') minNum = 30;
+        else if (min) minNum = parseInt(min, 10);
+        if ((mer === '下午' || mer === '晚上') && h < 12) h += 12;
+        if (mer === '中午' && h < 12) h += 12;
+        times.push(String(h).padStart(2, '0') + ':' + String(minNum).padStart(2, '0'));
+      }
+    }
+
     if (times.length >= 1) result.start = times[0];
     if (times.length >= 2) result.end = times[1];
 
-    const wageMatch = t.match(/时薪?[\s为是]?+(\d+)/) || t.match(/(\d+)(?:块|元)(?:一?小时|每小时|时薪)/) || t.match(/(\d+)\s*(?:块|元)\s*$/);
+    // 4. Parse brand - remove known info, what remains is likely the brand
+    let remaining = t;
+    remaining = remaining.replace(/今天|今日|明天|明日|后天|大后天|下周|这周|本周|下个?月|这个?月|明年/g, ' ');
+    remaining = remaining.replace(/早上|上午|中午|下午|晚上|凌晨|清晨|夜间|晚间/g, ' ');
+    remaining = remaining.replace(/早班|中班|晚班|加班|自定义/g, ' ');
+    remaining = remaining.replace(/(\d{1,2})\s*[-到至]\s*(\d{1,2})/g, ' ');
+    remaining = remaining.replace(/\d{1,2}[:点](\d{1,2}|半)?/g, ' ');
+    remaining = remaining.replace(/时薪?[\s为是]?\d+/g, ' ');
+    remaining = remaining.replace(/每\s*小时\s*\d+/g, ' ');
+    remaining = remaining.replace(/\d+\s*(?:块|元)/g, ' ');
+    remaining = remaining.replace(/有个|班|的|是|在|去|来|上|下|点|号|日|月|周|到|至|时|薪/g, ' ');
+    remaining = remaining.replace(/[\d\s：:,，\-]/g, ' ').trim();
+
+    if (remaining.length >= 2) {
+      const words = remaining.split(/\s+/).filter(w => w.length >= 2);
+      if (words.length > 0) result.brand = words[0];
+    }
+
+    // 5. Parse wage
+    const wageMatch = t.match(/时薪?[\s为是]?(\d+)/) ||
+                      t.match(/(?:每|一?小时)\s*(\d+)/) ||
+                      t.match(/(\d+)(?:块|元)(?:一?小时|每小时|时薪)/) ||
+                      t.match(/(\d+)\s*(?:块|元)\s*$/);
     if (wageMatch) result.wage = parseFloat(wageMatch[1]);
 
     return result;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pink-schedule-v4';
+const CACHE_NAME = 'pink-schedule-v5';
 const ASSETS = [
   './',
   './index.html',

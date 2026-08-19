@@ -29,7 +29,7 @@
           <button class="ai-quick-btn text-xs px-2 py-1 rounded-full" style="background: var(--sakura-muted); color: var(--sakura-muted-foreground)" data-prompt="检查时间冲突">冲突检测</button>
         </div>
         <div class="flex gap-2">
-          <input id="ai-input" type="text" placeholder="输入消息，如"下周三八点欧莱雅早班"..." class="input-field flex-1" style="height: 36px">
+          <input id="ai-input" type="text" placeholder='如 "今天6-10点 珀莱雅 时薪200"' class="input-field flex-1" style="height: 36px">
           <button id="ai-send" class="btn-primary px-3 rounded-md" style="height: 36px">
             <i data-lucide="send" class="w-4 h-4"></i>
           </button>
@@ -50,7 +50,7 @@
       });
     });
 
-    addBotMessage('你好！我是你的AI排班助手。你可以问我关于工资、排班的问题，或者直接用自然语言添加班次，比如"5号早班欧莱雅9点到6点时薪30"。');
+    addBotMessage('你好！我是你的AI排班助手。你可以问我关于工资、排班的问题，或者直接用自然语言添加班次，比如"今天6-10点 珀莱雅 时薪200"。');
     if (window.lucide) lucide.createIcons();
   }
 
@@ -62,6 +62,7 @@
 
   function addUserMessage(text) {
     const messages = document.getElementById('ai-messages');
+    if (!messages) return;
     const div = document.createElement('div');
     div.className = 'ai-message-user fade-in';
     div.textContent = text;
@@ -71,6 +72,7 @@
 
   function addBotMessage(text) {
     const messages = document.getElementById('ai-messages');
+    if (!messages) return;
     const div = document.createElement('div');
     div.className = 'ai-message-bot fade-in whitespace-pre-wrap';
     div.textContent = text;
@@ -80,6 +82,7 @@
 
   function addLoading() {
     const messages = document.getElementById('ai-messages');
+    if (!messages) return;
     const div = document.createElement('div');
     div.id = 'ai-loading';
     div.className = 'ai-message-bot loading-dots';
@@ -95,50 +98,66 @@
 
   async function send() {
     const input = document.getElementById('ai-input');
+    if (!input) return;
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
     addUserMessage(text);
 
-    const parsed = AI.parseScheduleText(text);
-    if (parsed.date && parsed.start) {
-      addBotMessage('识别到班次信息：\n日期: ' + Utils.formatDateCN(parsed.date) + '\n班次: ' + (parsed.type || '未指定') + '\n品牌: ' + (parsed.brand || '未填写') + '\n时间: ' + parsed.start + ' - ' + (parsed.end || '未填写') + '\n时薪: ¥' + (parsed.wage || '未指定') + '\n\n点击下方"添加"按钮将此班次添加到日历，或在表单中手动确认。');
+    try {
+      const parsed = AI.parseScheduleText(text);
+      if (parsed.date && parsed.start) {
+        const msg = '识别到班次信息：\n' +
+          '日期: ' + Utils.formatDateCN(parsed.date) + '\n' +
+          '班次: ' + (parsed.type || '自定义') + '\n' +
+          '品牌: ' + (parsed.brand || '未填写') + '\n' +
+          '时间: ' + parsed.start + ' - ' + (parsed.end || '未填写') + '\n' +
+          '时薪: ¥' + (parsed.wage || '未指定');
+        addBotMessage(msg);
 
-      const messages = document.getElementById('ai-messages');
-      const addBtn = document.createElement('button');
-      addBtn.className = 'btn-primary px-3 py-1.5 rounded-md text-xs mt-2';
-      addBtn.textContent = '添加班次';
-      addBtn.addEventListener('click', () => {
-        const shifts = Store.loadShifts();
-        shifts.push({
-          id: Date.now(),
-          date: parsed.date,
-          type: parsed.type || '自定义',
-          brand: parsed.brand || '',
-          start: parsed.start,
-          end: parsed.end || '18:00',
-          wage: parsed.wage || 25
+        const messages = document.getElementById('ai-messages');
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-primary px-3 py-1.5 rounded-md text-xs mt-2';
+        addBtn.textContent = '添加班次';
+        addBtn.addEventListener('click', () => {
+          try {
+            const shifts = Store.loadShifts();
+            shifts.push({
+              id: Date.now(),
+              date: parsed.date,
+              type: parsed.type || '自定义',
+              brand: parsed.brand || '',
+              start: parsed.start,
+              end: parsed.end || '18:00',
+              wage: parsed.wage || 25
+            });
+            Store.saveShifts(shifts);
+            Utils.showToast('班次已添加');
+            if (typeof refreshApp === 'function') refreshApp();
+          } catch (e) {
+            Utils.showToast('添加失败: ' + e.message);
+          }
         });
-        Store.saveShifts(shifts);
-        Utils.showToast('班次已添加');
-        if (typeof refreshApp === 'function') refreshApp();
-      });
-      messages.appendChild(addBtn);
-      messages.scrollTop = messages.scrollHeight;
-      return;
-    }
+        messages.appendChild(addBtn);
+        messages.scrollTop = messages.scrollHeight;
+        return;
+      }
 
-    addLoading();
-    const shifts = Store.loadShifts();
-    const result = await AI.chat(text, { shifts: shifts });
-    removeLoading();
+      addLoading();
+      const shifts = Store.loadShifts();
+      const result = await AI.chat(text, { shifts: shifts });
+      removeLoading();
 
-    if (result.success) {
-      addBotMessage(result.reply);
-    } else if (result.fallback) {
-      addBotMessage(result.fallback);
-    } else {
-      addBotMessage('出错了: ' + result.error);
+      if (result.success) {
+        addBotMessage(result.reply);
+      } else if (result.fallback) {
+        addBotMessage(result.fallback);
+      } else {
+        addBotMessage('出错了: ' + (result.error || '未知错误'));
+      }
+    } catch (e) {
+      removeLoading();
+      addBotMessage('发送失败: ' + (e.message || '未知错误') + '\n请检查网络或API配置');
     }
   }
 
