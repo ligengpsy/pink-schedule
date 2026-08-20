@@ -248,6 +248,48 @@ html, body {
 }
 .nav-scroll::-webkit-scrollbar { display: none; }
 
+.month-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--sakura-border);
+  border-radius: var(--sakura-radius-md);
+  overflow: hidden;
+  width: 64px;
+}
+.month-spinner-btn {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--sakura-muted-foreground);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  width: 100%;
+}
+.month-spinner-btn:hover {
+  background: var(--sakura-muted);
+  color: var(--sakura-primary);
+}
+.month-spinner-btn svg {
+  width: 12px;
+  height: 12px;
+}
+.month-spinner-label {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sakura-foreground);
+  white-space: nowrap;
+  flex: 1;
+}
+
 @media (max-width: 768px) {
   .nav-brand-text { display: none; }
   .nav-link { padding: 6px 10px; font-size: 13px; }

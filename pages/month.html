@@ -72,11 +72,12 @@
           <option value="加班">加班</option>
         </select>
       </div>
-      <div class="flex items-center gap-1" style="flex-shrink: 0">
-        <button id="prev-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-        <select id="year-select" class="input-field" style="height: 36px; width: auto"></select>
-        <select id="month-select" class="input-field" style="height: 36px; width: auto"></select>
-        <button id="next-month" class="btn-ghost p-2 rounded-md"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+      <div class="flex items-center gap-2" style="flex-shrink: 0">
+        <div class="month-spinner">
+          <button id="prev-month" class="month-spinner-btn"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
+          <span id="month-display" class="month-spinner-label">8月</span>
+          <button id="next-month" class="month-spinner-btn"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+        </div>
         <button id="today-btn" class="btn-ghost px-3 py-1.5 rounded-md text-sm whitespace-nowrap">今天</button>
       </div>
     </div>
@@ -213,8 +214,7 @@
 
     (function() {
       const calendarGrid = document.getElementById('calendar-grid');
-      const yearSelect = document.getElementById('year-select');
-      const monthSelect = document.getElementById('month-select');
+      const monthDisplay = document.getElementById('month-display');
       const searchInput = document.getElementById('search-input');
       const filterType = document.getElementById('filter-type');
 
@@ -235,22 +235,12 @@
         return shifts;
       }
 
-      function initSelectors() {
-        const baseYear = today.getFullYear();
-        yearSelect.innerHTML = '';
-        for (let y = baseYear - 5; y <= baseYear + 5; y++) {
-          yearSelect.add(new Option(y + '年', y));
-        }
-        monthSelect.innerHTML = '';
-        for (let m = 0; m < 12; m++) {
-          monthSelect.add(new Option((m + 1) + '月', m));
-        }
+      function updateMonthDisplay() {
+        monthDisplay.textContent = (currentMonth + 1) + '月';
       }
 
-      function updateSelectors() {
-        yearSelect.value = currentYear;
-        monthSelect.value = currentMonth;
-      }
+      function initSelectors() {}
+      function updateSelectors() { updateMonthDisplay(); }
 
       function renderMonth() {
         const shifts = getFilteredShifts();
@@ -469,11 +459,9 @@
         Utils.exportCSV('排班_' + prefix + '.csv', rows);
       });
 
-      yearSelect.addEventListener('change', () => { currentYear = parseInt(yearSelect.value); renderMonth(); renderSummary(); });
-      monthSelect.addEventListener('change', () => { currentMonth = parseInt(monthSelect.value); renderMonth(); renderSummary(); });
-      document.getElementById('prev-month').addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateSelectors(); renderMonth(); renderSummary(); });
-      document.getElementById('next-month').addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateSelectors(); renderMonth(); renderSummary(); });
-      document.getElementById('today-btn').addEventListener('click', () => { currentYear = today.getFullYear(); currentMonth = today.getMonth(); updateSelectors(); renderMonth(); renderSummary(); });
+      document.getElementById('prev-month').addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateMonthDisplay(); renderMonth(); renderSummary(); });
+      document.getElementById('next-month').addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateMonthDisplay(); renderMonth(); renderSummary(); });
+      document.getElementById('today-btn').addEventListener('click', () => { currentYear = today.getFullYear(); currentMonth = today.getMonth(); updateMonthDisplay(); renderMonth(); renderSummary(); });
       searchInput.addEventListener('input', Utils.debounce(() => { renderMonth(); renderSummary(); }));
       filterType.addEventListener('change', () => { renderMonth(); renderSummary(); });
 
